@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #040c21;
+  color: white;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Spotlight overlay ─────────────────────────────────── */
+.spotlight-overlay {
+  background: rgba(2, 6, 23, 0.92);
+  -webkit-mask-image: radial-gradient(
+    ellipse 280px 320px at var(--mx) var(--my),
+    transparent 0%,
+    rgba(0, 0, 0, 0.55) 65%,
+    black 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 280px 320px at var(--mx) var(--my),
+    transparent 0%,
+    rgba(0, 0, 0, 0.55) 65%,
+    black 100%
+  );
+}
