@@ -111,7 +111,7 @@ function LinkRow({ icon, label, sub, href, onClose }) {
   )
 }
 
-export default function Header() {
+export default function Header({ minimal = false }) {
   const [open, setOpen] = useState(false)
   const dropRef = useRef(null)
 
@@ -137,7 +137,7 @@ export default function Header() {
         fontFamily: SANS, fontSize: '13px', fontWeight: 400, letterSpacing: '0.04em',
         color: 'rgba(255,255,255,0.5)',
       }}>
-        {[{ label: 'Work', to: '/' }, { label: 'About', to: '/about' }].map(item => (
+        {!minimal && [{ label: 'Work', to: '/' }, { label: 'About', to: '/about' }].map(item => (
           <Link key={item.label} to={item.to}
             style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.9)'}
