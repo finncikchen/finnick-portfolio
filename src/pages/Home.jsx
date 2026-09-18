@@ -180,7 +180,7 @@ export default function Home() {
             lineHeight: 1.2, letterSpacing: '0em',
             color: '#edf0f7', margin: '0 0 16px',
           }}>
-            Finnick is a Product Designer based in Seattle. Worked at Cisco, ByteDance, and Bosch.
+            Finnick is a Product Designer based in Seattle. Worked at Cisco, TikTok, and Bosch.
           </h1>
           <p style={{
             fontFamily: SANS, fontWeight: 300,
