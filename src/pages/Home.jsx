@@ -10,8 +10,9 @@ import thumbYhlo       from '../assets/images/thumb-yhlo.png'
 import thumbFlowerStar from '../assets/images/thumb-flower-star.png'
 // Cisco thumbnail not yet available — card uses gradient placeholder
 
-const SERIF = '"Cormorant Garamond", serif'
-const SANS  = 'Inter, sans-serif'
+const SERIF   = '"Cormorant Garamond", serif'
+const DISPLAY = '"Playfair Display", serif'
+const SANS    = 'Inter, sans-serif'
 
 const PROJECTS = [
   {
@@ -165,39 +166,28 @@ export default function Home() {
         <Header />
 
         {/* ── HERO ── */}
-        <section style={{ textAlign: 'center', padding: '64px 24px 56px' }}>
-          <p style={{
-            fontFamily: SANS, fontWeight: 400,
-            fontSize: '11px', letterSpacing: '0.26em', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.25)', marginBottom: '20px',
-          }}>
-            Product / UX Designer
-          </p>
-
-          <h1 style={{
-            fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400,
-            fontSize: 'clamp(56px, 6.5vw, 92px)',
-            lineHeight: 1.05, letterSpacing: '0.01em',
-            color: '#edf0f7', margin: '0 0 28px',
-          }}>
-            I&rsquo;m Finnick.
-          </h1>
-
-          {/* thin rule + descriptor */}
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            gap: '20px', maxWidth: '520px', margin: '0 auto',
-          }}>
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-            <p style={{
-              fontFamily: SANS, fontWeight: 300, fontSize: '12.5px',
-              letterSpacing: '0.04em', color: 'rgba(255,255,255,0.6)',
-              margin: 0, whiteSpace: 'nowrap',
-            }}>
-              Enterprise &amp; Consumer&ensp;·&ensp;UW HCI
-            </p>
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+        <section style={{ padding: '60px 48px 48px', maxWidth: '1160px', margin: '0 auto' }}>
+          {/* verified badge */}
+          <div style={{ marginBottom: 20 }}>
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 2L21.5 6.5L27.5 5.5L28.5 11.5L34 14L31.5 19.5L34 25L28.5 27.5L27.5 33.5L21.5 32.5L18 37L14.5 32.5L8.5 33.5L7.5 27.5L2 25L4.5 19.5L2 14L7.5 11.5L8.5 5.5L14.5 6.5L18 2Z" fill="#1D9BF0"/>
+              <path d="M12 18.5L16 22.5L24 14.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
+          <h1 style={{
+            fontFamily: DISPLAY, fontWeight: 400,
+            fontSize: 'clamp(26px, 3.2vw, 46px)',
+            lineHeight: 1.2, letterSpacing: '0em',
+            color: '#edf0f7', margin: '0 0 16px',
+          }}>
+            Finnick is a Product Designer based in Seattle. Worked at Cisco, ByteDance, and Bosch.
+          </h1>
+          <p style={{
+            fontFamily: SANS, fontWeight: 300,
+            color: 'rgba(228,228,228,0.9)', margin: 0, lineHeight: 1.5, fontSize: '18px',
+          }}>
+            Experience across AI, B2B SaaS, and enterprise platforms.
+          </p>
         </section>
 
         {/* ── FILTER + GRID ── */}
@@ -387,8 +377,8 @@ function ProjectCard({ project: p, index, visible }) {
         }}>
           <div>
             <h3 style={{
-              fontFamily: SERIF, fontWeight: 500,
-              fontSize: '20px', lineHeight: 1.15, letterSpacing: '0.01em',
+              fontFamily: SANS, fontWeight: 600,
+              fontSize: '17px', lineHeight: 1.2, letterSpacing: '-0.01em',
               color: '#fff',
               margin: '0 0 4px', transition: 'color 0.22s',
             }}>

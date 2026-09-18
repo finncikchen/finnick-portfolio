@@ -148,9 +148,9 @@ export default function About() {
                 Product / UX Designer
               </p>
               <h1 style={{
-                fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400,
-                fontSize: 'clamp(52px, 6vw, 84px)', lineHeight: 1.0,
-                color: '#fff', margin: 0, letterSpacing: '0.01em',
+                fontFamily: SANS, fontStyle: 'normal', fontWeight: 700,
+                fontSize: 'clamp(48px, 5.5vw, 78px)', lineHeight: 1.0,
+                color: '#fff', margin: 0, letterSpacing: '-0.03em',
                 textShadow: '0 4px 40px rgba(0,0,0,0.8)',
               }}>
                 Finnick Chen.
@@ -211,8 +211,8 @@ export default function About() {
                   {/* projection glow behind number */}
                   <div style={{ position: 'relative' }}>
                     <span style={{
-                      fontFamily: SERIF, fontStyle: 'italic', fontWeight: 300,
-                      fontSize: '52px', lineHeight: 1,
+                      fontFamily: SANS, fontStyle: 'normal', fontWeight: 700,
+                      fontSize: '48px', lineHeight: 1,
                       color: 'rgba(255,255,255,0.82)',
                       display: 'block',
                       textShadow: '0 0 40px rgba(180,210,255,0.5), 0 0 80px rgba(140,180,255,0.2)',
@@ -266,9 +266,9 @@ export default function About() {
         {/* pull quote */}
         <div style={{ maxWidth: '700px', marginBottom: '72px' }}>
           <p style={{
-            fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400,
-            fontSize: 'clamp(28px, 3.5vw, 44px)', lineHeight: 1.4,
-            color: '#e8edf5', margin: 0,
+            fontFamily: SANS, fontStyle: 'normal', fontWeight: 300,
+            fontSize: 'clamp(24px, 3vw, 38px)', lineHeight: 1.5,
+            color: '#e8edf5', margin: 0, letterSpacing: '-0.01em',
           }}>
             &ldquo;I&rsquo;m curious about how people experience things, and how small details shape those moments.&rdquo;
           </p>
@@ -341,9 +341,9 @@ export default function About() {
           Let&rsquo;s connect
         </p>
         <h2 style={{
-          fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400,
-          fontSize: 'clamp(36px, 4vw, 56px)',
-          color: '#fff', margin: 0, lineHeight: 1.1,
+          fontFamily: SANS, fontStyle: 'normal', fontWeight: 600,
+          fontSize: 'clamp(32px, 3.5vw, 50px)',
+          color: '#fff', margin: 0, lineHeight: 1.15, letterSpacing: '-0.02em',
         }}>
           Let&rsquo;s make something great together.
         </h2>
