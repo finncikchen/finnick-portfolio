@@ -112,8 +112,15 @@ export default function Cisco() {
           so operators go from alert to action without losing context
         </h1>
 
-        {/* Hero image — full content width */}
-        <Placeholder label="Hero — Intersight header redesign overview" aspect="16/9" />
+        {/* Hero video — full content width */}
+        <video
+          src="/cisco-hero.mov"
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{ width: '100%', aspectRatio: '16/9', borderRadius: 12, objectFit: 'cover', display: 'block' }}
+        />
 
         {/* "Open live site" style link */}
         <a
