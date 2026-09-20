@@ -113,7 +113,7 @@ export default function Cisco() {
         </h1>
 
         {/* Hero image — full content width */}
-        <Placeholder label="Hero — Intersight header redesign overview" aspect="16/7" />
+        <Placeholder label="Hero — Intersight header redesign overview" aspect="16/9" />
 
         {/* "Open live site" style link */}
         <a
