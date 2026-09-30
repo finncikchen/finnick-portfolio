@@ -4,10 +4,16 @@ import Header from '../components/Header'
 import CurtainIntro from '../components/CurtainIntro'
 import homeBg from '../assets/images/home-bg.png'
 
-import thumbBytedance  from '../assets/images/thumb-bytedance.png'
+import thumbBytedance  from '../assets/images/thumb-bytedance.webp'
 import thumbBosch      from '../assets/images/thumb-bosch.png'
 import thumbYhlo       from '../assets/images/thumb-yhlo.png'
 import thumbFlowerStar from '../assets/images/thumb-flower-star.png'
+import BoschCover from '../components/bosch/Cover'
+import YhloCover from '../components/YhloCover'
+import LiveRMS from '../components/LiveRMS'
+import glassBg from '../assets/images/bytedance/hero-bg.webp'
+import fsCover from '../assets/images/flowerstar/cover.png'
+import thumbColorDiary from '../assets/images/thumb-colordiary.webp'
 // Cisco thumbnail not yet available — card uses gradient placeholder
 
 const SERIF   = '"Cormorant Garamond", serif'
@@ -18,56 +24,47 @@ const PROJECTS = [
   {
     id: 'cisco', title: 'Cisco Intersight',
     subtitle: 'Insight to Action — Header Design',
-    tags: ['Enterprise', 'SaaS'], year: '2024',
-    category: 'software', thumb: null, objectPos: 'center center',
-    gradient: 'linear-gradient(135deg, #00bceb 0%, #1d5ea8 50%, #003087 100%)',
-  },
-  {
-    id: 'bytedance', title: 'ByteDance',
-    subtitle: 'Internal Operations Platform',
-    tags: ['Enterprise', 'B2B'], year: '2022–23',
-    category: 'software', thumb: thumbBytedance, objectPos: 'center top',
+    tags: ['Enterprise', 'SaaS'], year: '2026',
+    category: 'products', thumb: null, objectPos: 'center center',
+    gradient: 'radial-gradient(ellipse 70% 80% at 8% 10%, rgba(150,225,250,0.85) 0%, transparent 65%), radial-gradient(ellipse 60% 70% at 95% 95%, rgba(140,165,245,0.7) 0%, transparent 65%), radial-gradient(ellipse 45% 45% at 70% 25%, rgba(255,255,255,0.9) 0%, transparent 70%), linear-gradient(160deg, #e3f1fb 0%, #c9dcf5 55%, #d9e2f8 100%)',
   },
   {
     id: 'bosch', title: 'Bosch',
     subtitle: 'Finance Operations Dashboard',
-    tags: ['Enterprise', 'FinTech'], year: '2023',
-    category: 'software', thumb: thumbBosch, objectPos: 'center 30%',
+    tags: ['Enterprise', 'FinTech'], year: '2025',
+    category: 'products', thumb: thumbBosch, cover: true, objectPos: 'center 30%',
   },
   {
-    id: 'flower-star', title: 'Flower Star',
-    subtitle: 'Consumer Mobile Experience',
-    tags: ['Consumer', 'Mobile'], year: '2022',
-    category: 'software', thumb: thumbFlowerStar, objectPos: 'center top',
+    id: 'bytedance', title: 'ByteDance',
+    subtitle: 'Internal Operations Platform',
+    tags: ['Enterprise', 'B2B'], year: '2024',
+    category: 'products', thumb: thumbBytedance, cover: true, objectPos: 'center center',
   },
   {
     id: 'yhlo', title: 'YHLO',
     subtitle: 'Medical Device UX System',
-    tags: ['Healthcare', 'Hardware'], year: '2023',
-    category: 'hardware', thumb: thumbYhlo, objectPos: 'center center',
+    tags: ['Healthcare', 'Hardware'], year: '2024',
+    category: 'products', thumb: thumbYhlo, cover: true, objectPos: 'center center',
   },
   {
-    id: 'coming-soon-1',
-    title: 'Coming Soon',
-    subtitle: 'New Project In Progress',
-    tags: ['TBD'], year: '2025',
-    category: 'software',
-    thumb: null,
+    id: 'flower-star', title: 'Flower Star',
+    subtitle: 'Consumer Mobile Experience',
+    tags: ['Consumer', 'Mobile'], year: '2024',
+    category: 'visuals', thumb: thumbFlowerStar, cover: true, objectPos: 'center top',
   },
   {
-    id: 'coming-soon-2',
-    title: 'Coming Soon',
-    subtitle: 'New Project In Progress',
-    tags: ['TBD'], year: '2025',
-    category: 'hardware',
-    thumb: null,
+    id: 'color-diary', title: 'Color Diary',
+    subtitle: 'Vibe-Coded Cover Generator',
+    tags: ['Vibe Coding', 'Web App'], year: '2026',
+    category: 'visuals', thumb: thumbColorDiary, objectPos: 'center center',
+    url: 'https://colordiary.finnickchen.site/',
   },
 ]
 
 const FILTERS = [
   { key: 'all',      label: 'All' },
-  { key: 'software', label: 'Software' },
-  { key: 'hardware', label: 'Hardware' },
+  { key: 'products', label: 'Products' },
+  { key: 'visuals',  label: 'Visuals' },
 ]
 
 export default function Home() {
@@ -198,14 +195,10 @@ export default function Home() {
             display: 'flex', alignItems: 'center',
             justifyContent: 'space-between', marginBottom: '24px',
           }}>
-            <span style={{
-              fontFamily: SANS, fontWeight: 400, fontSize: '11px',
-              letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.5)',
-            }}>
-              Selected Work
-            </span>
             <FilterTabs filter={filter} onChange={setFilter} />
+            <span style={{ fontFamily: SANS, fontSize: '15px', color: 'rgba(255,255,255,0.45)' }}>
+              {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
+            </span>
           </div>
 
           {/* 2 × 2 grid — fixed, no layout changes */}
@@ -224,6 +217,26 @@ export default function Home() {
 }
 
 /* ── Card ─────────────────────────────────────────────────── */
+
+// Covers follow the ByteDance thumb: diffuse glass background + one hero screen in a frosted frame
+function Cover({ id, hovered }) {
+  const lift = { transition: 'transform 0.5s ease', transform: hovered ? 'translate(-50%, -50%) scale(1.03)' : 'translate(-50%, -50%)' }
+  const frame = { position: 'absolute', left: '50%', top: '56%', width: '80%', padding: '1.2%', borderRadius: 10, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(8px)', boxShadow: '0 24px 60px rgba(40,70,140,0.22)', ...lift }
+  const bg = (filter) => <div style={{ position: 'absolute', inset: 0, background: `url(${glassBg}) center / cover`, filter }} />
+  if (id === 'bosch') return <BoschCover hovered={hovered} />
+  if (id === 'bytedance') return (
+    <div style={{ position: 'absolute', inset: 0 }}>
+      {bg()}
+      <div style={{ ...frame, width: '70%', top: '54%' }}><div style={{ borderRadius: 6, overflow: 'hidden' }}><LiveRMS /></div></div>
+    </div>
+  )
+  if (id === 'yhlo') return <YhloCover hovered={hovered} />
+  if (id === 'flower-star') return (
+    <img src={fsCover} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s ease', transform: hovered ? 'scale(1.04)' : 'none' }} />
+  )
+  return null
+}
+
 function ProjectCard({ project: p, index, visible }) {
   const cardRef  = useRef(null)
   const glowRef  = useRef(null)
@@ -259,8 +272,8 @@ function ProjectCard({ project: p, index, visible }) {
   // bytedance has a full case study; everything else opens behind a password gate
   const href = `/work/${p.id}`
 
-  const Wrapper = Link
-  const wrapperProps = { to: href }
+  const Wrapper = p.url ? 'a' : Link
+  const wrapperProps = p.url ? { href: p.url, target: '_blank', rel: 'noopener noreferrer' } : { to: href }
 
   return (
     <Wrapper
@@ -308,25 +321,50 @@ function ProjectCard({ project: p, index, visible }) {
         transform: 'translateZ(0)', backfaceVisibility: 'hidden',
         background: '#0b0e18',
       }}>
-        {p.thumb ? (
+        {p.cover ? (
+          <Cover id={p.id} hovered={hovered} />
+        ) : p.thumb ? (
           <img
             src={p.thumb} alt={p.title}
             style={{
               width: '100%', height: '100%',
               objectFit: 'cover', objectPosition: p.objectPos, display: 'block',
-              filter: p.id === 'bytedance'
+              filter: (p.id === 'bytedance' || p.id === 'bosch' || p.id === 'yhlo' || p.id === 'flower-star' || p.id === 'color-diary')
                 ? (hovered ? 'brightness(1.0)' : 'brightness(0.82)')
                 : (hovered ? 'brightness(0.55) blur(1.5px)' : 'brightness(0.45) blur(1.5px)'),
               transition: 'filter 0.4s ease',
             }}
           />
         ) : p.gradient ? (
-          <div style={{
-            width: '100%', height: '100%',
-            background: p.gradient,
-            opacity: hovered ? 0.85 : 0.7,
-            transition: 'opacity 0.4s ease',
-          }} />
+          <>
+            <div style={{
+              width: '100%', height: '100%',
+              background: p.gradient,
+              opacity: hovered ? 1 : 0.9,
+              transition: 'opacity 0.4s ease',
+            }} />
+            {p.id === 'cisco' && (
+              <>
+                {/* glass arcs */}
+                <div style={{ position: 'absolute', width: '90%', aspectRatio: '1', left: '-35%', top: '-55%', borderRadius: '50%', border: '28px solid rgba(255,255,255,0.35)', filter: 'blur(6px)' }} />
+                <div style={{ position: 'absolute', width: '110%', aspectRatio: '1', right: '-60%', bottom: '-95%', borderRadius: '50%', border: '40px solid rgba(255,255,255,0.28)', boxShadow: 'inset 0 0 60px rgba(120,160,240,0.35)', filter: 'blur(4px)' }} />
+                {/* grain */}
+                <div style={{ position: 'absolute', inset: 0, opacity: 0.22, mixBlendMode: 'overlay', backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")` }} />
+              </>
+            )}
+            {p.id === 'cisco' && (
+              <div style={{
+                position: 'absolute', left: '50%', top: '10%', width: '86%', aspectRatio: '1536/1024',
+                transform: `translateX(-50%) ${hovered ? 'translateY(-4px) scale(1.02)' : ''}`,
+                transition: 'transform 0.5s ease',
+              }}>
+                <video src="/cisco-hero.mov" autoPlay loop muted playsInline
+                  style={{ position: 'absolute', top: '8.1%', left: '8.72%', width: '82.49%', height: '60.35%', objectFit: 'fill' }} />
+                <img src="/cisco-ui/monitor-frame-17.png" alt=""
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+              </div>
+            )}
+          </>
         ) : (
           <div style={{
             width: '100%', height: '100%',
@@ -341,7 +379,7 @@ function ProjectCard({ project: p, index, visible }) {
             </span>
           </div>
         )}
-        {p.id !== 'bytedance' && p.id !== 'cisco' && (
+        {p.id !== 'bytedance' && p.id !== 'cisco' && p.id !== 'bosch' && p.id !== 'yhlo' && p.id !== 'flower-star' && p.id !== 'color-diary' && (
           <div style={{
             position: 'absolute', inset: 0,
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px',
@@ -441,27 +479,25 @@ function FilterTabs({ filter, onChange }) {
   }, [filter])
 
   return (
-    <div ref={barRef} style={{ position: 'relative', display: 'flex', gap: '2px' }}>
+    <div ref={barRef} style={{ position: 'relative', display: 'flex', gap: '24px', paddingBottom: 8 }}>
+      {/* sliding underline under the active tab */}
       <div style={{
-        position: 'absolute', top: 0,
-        left: pill.left, width: pill.width, height: '32px',
-        background: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: '100px',
-        transition: 'left 0.26s cubic-bezier(0.4,0,0.2,1), width 0.26s cubic-bezier(0.4,0,0.2,1)',
+        position: 'absolute', bottom: 0, height: 2, borderRadius: 1,
+        left: pill.left, width: pill.width, background: '#fff',
+        transition: 'left 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)',
         pointerEvents: 'none',
       }} />
       {FILTERS.map(f => (
         <button key={f.key}
           ref={el => { refs.current[f.key] = el }}
           onClick={() => onChange(f.key)}
+          onMouseEnter={e => { if (filter !== f.key) e.currentTarget.style.color = 'rgba(255,255,255,0.8)' }}
+          onMouseLeave={e => { if (filter !== f.key) e.currentTarget.style.color = 'rgba(255,255,255,0.45)' }}
           style={{
-            fontFamily: SANS, fontWeight: 400, fontSize: '12px', letterSpacing: '0.04em',
-            color: filter === f.key ? '#fff' : 'rgba(255,255,255,0.6)',
-            background: 'transparent', border: 'none',
-            borderRadius: '100px', padding: '0 18px', height: '32px',
+            fontFamily: SANS, fontWeight: 400, fontSize: '18px', letterSpacing: '-0.01em',
+            color: filter === f.key ? '#fff' : 'rgba(255,255,255,0.45)',
+            background: 'transparent', border: 'none', padding: 0,
             cursor: 'pointer', transition: 'color 0.2s',
-            position: 'relative', zIndex: 1,
           }}
         >
           {f.label}

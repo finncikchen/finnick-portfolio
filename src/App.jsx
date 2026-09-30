@@ -3,6 +3,9 @@ import Home from './pages/Home'
 import About from './pages/About'
 import ByteDance from './pages/ByteDance'
 import Cisco from './pages/Cisco'
+import Bosch from './pages/Bosch'
+import Yhlo from './pages/Yhlo'
+import FlowerStar from './pages/FlowerStar'
 import Locked from './pages/Locked'
 
 export default function App() {
@@ -13,6 +16,9 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/work/cisco" element={<Cisco />} />
         <Route path="/work/bytedance" element={<ByteDance />} />
+        <Route path="/work/bosch" element={<Bosch />} />
+        <Route path="/work/yhlo" element={<Yhlo />} />
+        <Route path="/work/flower-star" element={<FlowerStar />} />
         <Route path="/work" element={<Navigate to="/" replace />} />
         <Route path="/work/:id" element={<Locked />} />
       </Routes>
