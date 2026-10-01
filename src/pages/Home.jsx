@@ -225,7 +225,7 @@ function Cover({ id, hovered }) {
   const bg = (filter) => <div style={{ position: 'absolute', inset: 0, background: `url(${glassBg}) center / cover`, filter }} />
   if (id === 'bosch') return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 55% 60% at 8% 5%, #f2dcf0 0%, rgba(242,220,240,0) 70%), radial-gradient(ellipse 60% 70% at 100% 100%, #cfe4f7 0%, rgba(207,228,247,0) 70%), radial-gradient(ellipse 50% 50% at 60% 40%, #ffffff 0%, rgba(255,255,255,0) 70%), #eef0f7' }} />
+      {bg('hue-rotate(28deg) saturate(0.45) brightness(1.05)')}
       <div style={{ ...frame, width: '70%', top: '54%' }}><div style={{ borderRadius: 6, overflow: 'hidden' }}><Scaled><BoschDashboard /></Scaled></div></div>
     </div>
   )
