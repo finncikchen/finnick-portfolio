@@ -4,7 +4,7 @@ import logo from '../assets/images/logo.svg'
 import avatar from '../assets/images/profile.png'
 
 const SANS = 'Inter, sans-serif'
-const EMAIL = 'finnick1106@gmail.com'
+const EMAIL = 'c4han@uw.edu'
 
 function IconMail() {
   return (
@@ -111,7 +111,7 @@ function LinkRow({ icon, label, sub, href, onClose }) {
   )
 }
 
-export default function Header({ minimal = false }) {
+export default function Header({ minimal = false, darkLogo = false, logoColor }) {
   const [open, setOpen] = useState(false)
   const dropRef = useRef(null)
 
@@ -129,24 +129,29 @@ export default function Header({ minimal = false }) {
       padding: '28px 52px', width: '100%', position: 'relative', zIndex: 10,
     }}>
       <Link to="/" style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
-        <img src={logo} alt="FINNICK" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+        {logoColor ? (
+          <span role="img" aria-label="FINNICK" style={{ display: 'block', height: '100%', aspectRatio: '672 / 83', background: logoColor, WebkitMask: `url("${logo}") center / contain no-repeat`, mask: `url("${logo}") center / contain no-repeat` }} />
+        ) : (
+          <img src={logo} alt="FINNICK" style={{ height: '100%', width: 'auto', objectFit: 'contain', filter: darkLogo ? 'invert(1) brightness(0.12)' : 'none' }} />
+        )}
       </Link>
 
       <nav style={{
         display: 'flex', gap: '36px', alignItems: 'center',
         fontFamily: SANS, fontSize: '13px', fontWeight: 400, letterSpacing: '0.04em',
-        color: 'rgba(255,255,255,0.5)',
+        color: darkLogo ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
+        paddingRight: minimal ? 0 : 190,
       }}>
         {!minimal && [{ label: 'Work', to: '/' }, { label: 'About', to: '/about' }].map(item => (
           <Link key={item.label} to={item.to}
             style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.9)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}
+            onMouseEnter={e => e.currentTarget.style.color = darkLogo ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.9)'}
+            onMouseLeave={e => e.currentTarget.style.color = darkLogo ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'}
           >{item.label}</Link>
         ))}
 
         {/* Contact me */}
-        <div ref={dropRef} style={{ position: 'relative' }}>
+        <div ref={dropRef} style={{ position: 'fixed', top: 22, right: 52, zIndex: 100, borderRadius: 999, background: 'rgba(22,22,24,0.72)', boxShadow: '0 6px 20px rgba(0,0,0,0.18)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
           <button onClick={() => setOpen(v => !v)} style={{
             display: 'flex', alignItems: 'center', gap: 8,
             background: open ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.08)',
@@ -180,7 +185,7 @@ export default function Header({ minimal = false }) {
               <LinkRow icon={<IconLinkedIn />} label="LinkedIn" sub="linkedin.com/in/finnick-chen"
                 href="https://www.linkedin.com/in/finnick-chen" onClose={() => setOpen(false)} />
               <LinkRow icon={<IconFile />} label="Resume" sub="View PDF"
-                href="https://drive.google.com/file/d/18YmO4nCD5nnzxserhyF82_zqdPp9TSTd/view?usp=drive_link" onClose={() => setOpen(false)} />
+                href="/Finnick_Chen_Resume.pdf" onClose={() => setOpen(false)} />
             </div>
           )}
         </div>
