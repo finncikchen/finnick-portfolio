@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import Header from './Header'
 import { F, INK, SUB, LIGHT, FADE, W, WIDE, STATEMENT, EYEBROW, CARD_SHADOW, GRAIN, MESH_HERO, MESH_SOFT, PANEL_SOFT } from './caseTokens'
 
@@ -168,21 +168,30 @@ export function ContactCTA() {
   )
 }
 
-export function FooterNav({ next }) {
-  const link = { fontFamily: F, fontSize: 14, color: SUB, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }
+// Case-study order, matching the home page grid; the last one loops back to the first
+export const CASE_ORDER = [
+  ['/work/cisco', 'Cisco'], ['/work/bosch', 'Bosch'], ['/work/bytedance', 'ByteDance'],
+  ['/work/yhlo', 'YHLO'], ['/work/flower-star', 'Flower Star'],
+]
+
+export function FooterNav({ dark }) {
+  const { pathname } = useLocation()
+  const i = CASE_ORDER.findIndex(([to]) => to === pathname)
+  const next = CASE_ORDER[(i + 1) % CASE_ORDER.length]
+  const base = dark ? 'rgba(238,241,250,0.55)' : SUB, hover = dark ? '#eef1fa' : INK
+  const link = { fontFamily: F, fontSize: 14, color: base, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }
+  const on = e => { e.currentTarget.style.color = hover }, off = e => { e.currentTarget.style.color = base }
   return (
-    <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+    <div style={{ borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
       <div style={{ ...W, paddingTop: 36, paddingBottom: 60, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/" style={link} onMouseEnter={e => e.currentTarget.style.color = INK} onMouseLeave={e => e.currentTarget.style.color = SUB}>
+        <Link to="/" style={link} onMouseEnter={on} onMouseLeave={off}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           All Work
         </Link>
-        {next && (
-          <Link to={next.to} style={link} onMouseEnter={e => e.currentTarget.style.color = INK} onMouseLeave={e => e.currentTarget.style.color = SUB}>
-            Next: {next.label}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </Link>
-        )}
+        <Link to={next[0]} style={link} onMouseEnter={on} onMouseLeave={off}>
+          Next: {next[1]}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </Link>
       </div>
     </div>
   )

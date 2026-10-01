@@ -253,7 +253,7 @@ export default function Bosch() {
       </section>
 
       <ContactCTA />
-      <FooterNav next={{ to: '/work/yhlo', label: 'YHLO' }} />
+      <FooterNav />
     </Page>
   )
 }

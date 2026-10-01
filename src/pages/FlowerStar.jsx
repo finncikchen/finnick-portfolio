@@ -1,3 +1,4 @@
+import { FooterNav } from '../components/CaseKit'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import { F, W, WIDE, GRAIN } from '../components/caseTokens'
@@ -283,12 +284,7 @@ export default function FlowerStar() {
         <a href="mailto:c4han@uw.edu" style={{ fontFamily: F, fontSize: 15, fontWeight: 500, color: SEA, background: TEXT, textDecoration: 'none', display: 'inline-flex', padding: '14px 24px', borderRadius: 999 }}>c4han@uw.edu ↗</a>
       </section>
 
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-        <div style={{ ...W, paddingTop: 36, paddingBottom: 60, display: 'flex', justifyContent: 'space-between' }}>
-          <Link to="/" style={{ fontFamily: F, fontSize: 14, color: DIM, textDecoration: 'none' }}>← All Work</Link>
-          <Link to="/work/cisco" style={{ fontFamily: F, fontSize: 14, color: DIM, textDecoration: 'none' }}>Next: Cisco →</Link>
-        </div>
-      </div>
+      <FooterNav dark />
     </div>
   )
 }
