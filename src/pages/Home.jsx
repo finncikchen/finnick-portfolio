@@ -8,7 +8,7 @@ import thumbBytedance  from '../assets/images/thumb-bytedance.webp'
 import thumbBosch      from '../assets/images/thumb-bosch.png'
 import thumbYhlo       from '../assets/images/thumb-yhlo.png'
 import thumbFlowerStar from '../assets/images/thumb-flower-star.png'
-import BoschCover from '../components/bosch/Cover'
+import BoschDashboard, { Scaled } from '../components/bosch/Dashboard'
 import YhloCover from '../components/YhloCover'
 import LiveRMS from '../components/LiveRMS'
 import glassBg from '../assets/images/bytedance/hero-bg.webp'
@@ -221,9 +221,14 @@ export default function Home() {
 // Covers follow the ByteDance thumb: diffuse glass background + one hero screen in a frosted frame
 function Cover({ id, hovered }) {
   const lift = { transition: 'transform 0.5s ease', transform: hovered ? 'translate(-50%, -50%) scale(1.03)' : 'translate(-50%, -50%)' }
-  const frame = { position: 'absolute', left: '50%', top: '56%', width: '80%', padding: '1.2%', borderRadius: 10, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(8px)', boxShadow: '0 24px 60px rgba(40,70,140,0.22)', ...lift }
+  const frame = { position: 'absolute', left: '50%', top: '56%', width: '80%', padding: '1.2%', borderRadius: 10, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(8px)', boxShadow: '0 1px 2px rgba(30,50,90,0.06), 0 8px 20px rgba(30,50,90,0.08), 0 28px 56px rgba(30,50,90,0.10)', ...lift }
   const bg = (filter) => <div style={{ position: 'absolute', inset: 0, background: `url(${glassBg}) center / cover`, filter }} />
-  if (id === 'bosch') return <BoschCover hovered={hovered} />
+  if (id === 'bosch') return (
+    <div style={{ position: 'absolute', inset: 0 }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 55% 60% at 8% 5%, #f2dcf0 0%, rgba(242,220,240,0) 70%), radial-gradient(ellipse 60% 70% at 100% 100%, #cfe4f7 0%, rgba(207,228,247,0) 70%), radial-gradient(ellipse 50% 50% at 60% 40%, #ffffff 0%, rgba(255,255,255,0) 70%), #eef0f7' }} />
+      <div style={{ ...frame, width: '70%', top: '54%' }}><div style={{ borderRadius: 6, overflow: 'hidden' }}><Scaled><BoschDashboard /></Scaled></div></div>
+    </div>
+  )
   if (id === 'bytedance') return (
     <div style={{ position: 'absolute', inset: 0 }}>
       {bg()}
