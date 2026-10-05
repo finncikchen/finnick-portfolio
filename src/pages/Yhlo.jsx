@@ -58,7 +58,7 @@ export default function Yhlo() {
       {/* ── HERO ── */}
       <Hero
         light
-        background="radial-gradient(ellipse 60% 60% at 85% 100%, rgba(102,223,231,0.22) 0%, rgba(102,223,231,0) 70%), linear-gradient(180deg, #f3fafb 0%, #ffffff 60%)"
+        background="radial-gradient(ellipse 70% 55% at 30% 72%, #fafafa 0%, rgba(250,250,250,0) 70%), linear-gradient(180deg, #f9f9f9 0%, #f6f6f6 45%, #eeeeee 100%)"
         brand={<p style={{ fontFamily: F, fontSize: 14, color: SUB, letterSpacing: '0.02em', margin: '0 0 24px' }}>YHLO · iTLA track unit</p>}
         title="A clearer touchscreen"
         sub="for automated lab sample processing."
