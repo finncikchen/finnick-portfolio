@@ -2,7 +2,7 @@ import { F, INK, SUB, FADE, WIDE, GAP, STATEMENT } from '../components/caseToken
 import { P, Page, Hero, SplitRow, ChapterHead, InfoTable, ContactCTA, FooterNav } from '../components/CaseKit'
 
 // every image below is an original layer exported from the YHLO Figma file
-import imgDevice      from '../assets/images/yhlo/device-cover.webp'
+import imgDevice      from '../assets/images/yhlo/device-front.webp'
 import { Workbench } from '../components/yhlo/ITLA'
 import { TrackHome, TrackEvents, TrackUnits, TrackTasks, DeviceZoom } from '../components/yhlo/Track'
 import { Scaled } from '../components/bosch/Dashboard'

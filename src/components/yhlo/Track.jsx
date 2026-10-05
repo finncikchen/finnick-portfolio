@@ -240,12 +240,16 @@ export function TrackUnits() {
 
 /* ── Device + its own screen, magnified: the small on-device display runs the live Home,
    and a large window shows the same screen, joined to it by connector lines.
-   device-cover.webp is 1591 x 1181; screen spans x 388–569, y 107–227; RUN key x 327–351, y 169–197. ── */
+   device-front.webp is 1456 x 1080 (front view, own light backdrop); screen spans x 350–525, y 103–223. ── */
+const IMG_W = 1456, IMG_H = 1080, SCR = { x: 350, y: 103, w: 175, h: 120 }
+// fade the photo's own backdrop into whatever sits behind it
+const EDGE_FADE = { WebkitMaskImage: 'linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 1.5%, #000 92%, transparent 100%)', WebkitMaskComposite: 'source-in', maskImage: 'linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 1.5%, #000 92%, transparent 100%)', maskComposite: 'intersect' }
+
 export function DeviceZoom({ device, screen = <TrackHome />, cw = 1600, ch = 900, annotate }) {
-  const D = { x: 60, y: 262, w: 740 }, k = D.w / 1591
-  const S = { x: D.x + 388 * k, y: D.y + 107 * k, w: 181 * k, h: 120 * k }
+  const D = { x: 60, y: 262, w: 740 }, k = D.w / IMG_W
+  const S = { x: D.x + SCR.x * k, y: D.y + SCR.y * k, w: SCR.w * k, h: SCR.h * k }
   const Z = { x: 720, y: 118, w: 820, h: 820 / 1.6 }
-  const floorY = D.y + 1181 * k - 14
+  const floorY = D.y + IMG_H * k - 14
   const Screen = ({ w, h }) => (
     <div style={{ width: w, height: h, overflow: 'hidden', position: 'relative' }}>
       <div style={{ position: 'absolute', left: 0, top: 0, width: 1280, height: 800, transform: `scale(${w / 1280}, ${h / 800})`, transformOrigin: '0 0' }}>{screen}</div>
@@ -254,14 +258,8 @@ export function DeviceZoom({ device, screen = <TrackHome />, cw = 1600, ch = 900
   const A1 = [S.x + S.w, S.y], A2 = [S.x + S.w, S.y + S.h], B1 = [Z.x, Z.y + 10], B2 = [Z.x, Z.y + Z.h - 10]
   return (
     <div style={{ position: 'relative', width: cw, height: ch }}>
-      {/* glow + floor */}
-      <div style={abs(D.x - 60, D.y - 80, D.w + 120, 1181 * k + 80, { background: `radial-gradient(ellipse 50% 45% at 45% 55%, ${CY}1f 0%, ${CY}00 70%)` })} />
-      <div style={abs(D.x + 20, floorY - 18, D.w - 40, 44, { background: 'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(10,40,50,0.22) 0%, rgba(10,40,50,0) 70%)' })} />
-      <img src={device} alt="YHLO iTLA track unit" style={abs(D.x, D.y, D.w, 1181 * k)} />
+      <img src={device} alt="YHLO iTLA track unit" style={abs(D.x, D.y, D.w, IMG_H * k, EDGE_FADE)} />
       <div style={abs(S.x, S.y, S.w, S.h, { borderRadius: 2, overflow: 'hidden', boxShadow: `0 0 0 1px #000, 0 0 14px ${CY}88` })}><Screen w={S.w} h={S.h} /></div>
-      <div style={abs(D.x + 327 * k, D.y + 169 * k, 24 * k, 28 * k, { borderRadius: 3, background: '#3cb2b3', display: 'grid', placeItems: 'center' })}>
-        <span style={{ fontFamily: FONT, fontSize: 5.2, fontWeight: 700, color: '#fff', lineHeight: 1 }}>RUN</span>
-      </div>
       {/* beam */}
       <svg width={cw} height={ch} style={abs(0, 0, cw, ch, { pointerEvents: 'none' })}>
         <defs>
@@ -292,16 +290,13 @@ export function DeviceZoom({ device, screen = <TrackHome />, cw = 1600, ch = 900
 
 /* ── Device alone, with the live Home on its own display ── */
 export function DeviceOnly({ device, x = 0, y = 0, w = 1000, shadow = true }) {
-  const k = w / 1591, S = { x: 388 * k, y: 107 * k, w: 181 * k, h: 120 * k }
+  const k = w / IMG_W, S = { x: SCR.x * k, y: SCR.y * k, w: SCR.w * k, h: SCR.h * k }
   return (
-    <div style={abs(x, y, w, 1181 * k)}>
-      {shadow && <div style={abs(w * 0.04, 1181 * k - 30, w * 0.92, 60, { background: 'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(10,40,50,0.22) 0%, rgba(10,40,50,0) 70%)' })} />}
-      <img src={device} alt="YHLO iTLA track unit" style={abs(0, 0, w, 1181 * k)} />
+    <div style={abs(x, y, w, IMG_H * k)}>
+      {shadow && <div style={abs(w * 0.04, IMG_H * k - 30, w * 0.92, 60, { background: 'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(10,40,50,0.22) 0%, rgba(10,40,50,0) 70%)' })} />}
+      <img src={device} alt="YHLO iTLA track unit" style={abs(0, 0, w, IMG_H * k, EDGE_FADE)} />
       <div style={abs(S.x, S.y, S.w, S.h, { borderRadius: 3, overflow: 'hidden', boxShadow: '0 0 0 1px #000' })}>
         <div style={{ width: 1280, height: 800, transform: `scale(${S.w / 1280}, ${S.h / 800})`, transformOrigin: '0 0' }}><TrackHome /></div>
-      </div>
-      <div style={abs(327 * k, 169 * k, 24 * k, 28 * k, { borderRadius: 4, background: '#3cb2b3', display: 'grid', placeItems: 'center' })}>
-        <span style={{ fontFamily: FONT, fontSize: 7 * k * 1.6, fontWeight: 700, color: '#fff', lineHeight: 1 }}>RUN</span>
       </div>
     </div>
   )
