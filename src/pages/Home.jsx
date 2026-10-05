@@ -12,7 +12,9 @@ import BoschDashboard, { Scaled } from '../components/bosch/Dashboard'
 import YhloCover from '../components/YhloCover'
 import LiveRMS from '../components/LiveRMS'
 import glassBg from '../assets/images/bytedance/hero-bg.webp'
-import fsCover from '../assets/images/flowerstar/cover.png'
+import fsLoop from '../assets/images/flowerstar/thumb-loop.mp4'
+import fsPoster from '../assets/images/flowerstar/thumb-poster.jpg'
+import cdUI from '../assets/images/colordiary-ui.webp'
 import thumbColorDiary from '../assets/images/thumb-colordiary.webp'
 // Cisco thumbnail not yet available — card uses gradient placeholder
 
@@ -49,14 +51,14 @@ const PROJECTS = [
   {
     id: 'flower-star', title: 'Flower Star',
     subtitle: 'Consumer Mobile Experience',
-    tags: ['Consumer', 'Mobile'], year: '2024',
+    tags: ['Consumer', 'Mobile'], year: '2025',
     category: 'visuals', thumb: thumbFlowerStar, cover: true, objectPos: 'center top',
   },
   {
     id: 'color-diary', title: 'Color Diary',
     subtitle: 'Vibe-Coded Cover Generator',
     tags: ['Vibe Coding', 'Web App'], year: '2026',
-    category: 'visuals', thumb: thumbColorDiary, objectPos: 'center center',
+    category: 'visuals', thumb: thumbColorDiary, cover: true, objectPos: 'center center',
     url: 'https://colordiary.finnickchen.site/',
   },
 ]
@@ -221,28 +223,29 @@ export default function Home() {
 // Covers follow the ByteDance thumb: diffuse glass background + one hero screen in a frosted frame
 function Cover({ id, hovered }) {
   const lift = { transition: 'transform 0.5s ease', transform: hovered ? 'translate(-50%, -50%) scale(1.03)' : 'translate(-50%, -50%)' }
-  const frame = { position: 'absolute', left: '50%', top: '56%', width: '80%', padding: '1.2%', borderRadius: 10, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(8px)', boxShadow: '0 1px 2px rgba(30,50,90,0.06), 0 8px 20px rgba(30,50,90,0.08), 0 28px 56px rgba(30,50,90,0.10)', ...lift }
+  const frame = { position: 'absolute', left: '50%', top: '56%', width: '80%', padding: '1.2%', borderRadius: 6, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(8px)', boxShadow: '0 1px 2px rgba(30,50,90,0.06), 0 8px 20px rgba(30,50,90,0.08), 0 28px 56px rgba(30,50,90,0.10)', ...lift }
   const bg = (filter) => <div style={{ position: 'absolute', inset: 0, background: `url(${glassBg}) center / cover`, filter }} />
   if (id === 'bosch') return (
-    <div style={{ position: 'absolute', inset: 0 }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 45% 60% at 12% 10%, rgba(80,130,255,0.38) 0%, rgba(80,130,255,0) 70%), radial-gradient(ellipse 40% 55% at 92% 15%, rgba(0,210,220,0.32) 0%, rgba(0,210,220,0) 70%), radial-gradient(ellipse 55% 50% at 75% 100%, rgba(150,90,255,0.30) 0%, rgba(150,90,255,0) 70%), radial-gradient(ellipse 30% 40% at 2% 90%, rgba(255,80,120,0.22) 0%, rgba(255,80,120,0) 70%), linear-gradient(180deg, #f6f8fd 0%, #eef2fa 100%)' }} />
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(70,120,220,0.09) 1px, transparent 1px), linear-gradient(90deg, rgba(70,120,220,0.09) 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'radial-gradient(ellipse 60% 55% at 50% 30%, #000 0%, transparent 80%)', WebkitMaskImage: 'radial-gradient(ellipse 60% 55% at 50% 30%, #000 0%, transparent 80%)' }} />
-      <div style={{ position: 'absolute', left: '20%', right: '20%', top: '10%', height: 1, background: 'linear-gradient(90deg, transparent, rgba(60,140,255,0.8), transparent)' }} />
-      <div style={{ position: 'absolute', left: '14%', right: '14%', top: '14%', borderRadius: '8px 8px 0 0', overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px rgba(80,140,255,0.25), 0 0 36px rgba(80,140,255,0.25), 0 18px 40px rgba(30,50,110,0.18)', transition: 'transform 0.5s ease', transform: hovered ? 'translateY(-4%)' : 'none' }}>
-        <div style={{ height: 3, background: 'linear-gradient(90deg, #e20015, #9e2896, #0062a3, #00a8b0, #78be20)' }} />
-        <Scaled><BoschDashboard /></Scaled>
-      </div>
+    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 60% at 0% 0%, #cfd2f5 0%, rgba(207,210,245,0) 70%), radial-gradient(ellipse 45% 55% at 100% 10%, #f3d3e6 0%, rgba(243,211,230,0) 70%), radial-gradient(ellipse 55% 50% at 85% 100%, #e7d0f0 0%, rgba(231,208,240,0) 70%), radial-gradient(ellipse 50% 50% at 10% 100%, #d6e0f6 0%, rgba(214,224,246,0) 70%), #ece6f6' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.35, mixBlendMode: 'soft-light', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+      <div style={{ ...frame, width: '70%', top: '50%' }}><div style={{ borderRadius: 3, overflow: 'hidden' }}><Scaled w={1760} h={1100}><BoschDashboard /></Scaled></div></div>
     </div>
   )
   if (id === 'bytedance') return (
     <div style={{ position: 'absolute', inset: 0 }}>
       {bg()}
-      <div style={{ ...frame, width: '70%', top: '54%' }}><div style={{ borderRadius: 6, overflow: 'hidden' }}><LiveRMS /></div></div>
+      <div style={{ ...frame, width: '70%', top: '50%' }}><div style={{ borderRadius: 3, overflow: 'hidden' }}><LiveRMS /></div></div>
     </div>
   )
   if (id === 'yhlo') return <YhloCover hovered={hovered} />
   if (id === 'flower-star') return (
-    <img src={fsCover} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s ease', transform: hovered ? 'scale(1.04)' : 'none' }} />
+    <video src={fsLoop} poster={fsPoster} autoPlay muted loop playsInline style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s ease', transform: hovered ? 'scale(1.04)' : 'none' }} />
+  )
+  if (id === 'color-diary') return (
+    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 65% 70% at 0% 0%, #fbd9c3 0%, rgba(251,217,195,0) 70%), radial-gradient(ellipse 55% 60% at 100% 0%, #f8d3d8 0%, rgba(248,211,216,0) 70%), radial-gradient(ellipse 70% 65% at 100% 100%, #dcd3f3 0%, rgba(220,211,243,0) 70%), radial-gradient(ellipse 55% 55% at 0% 100%, #f3dde6 0%, rgba(243,221,230,0) 70%), #f8eeec' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.35, mixBlendMode: 'soft-light', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+      <div style={{ ...frame, width: '70%', top: '50%' }}><div style={{ borderRadius: 3, overflow: 'hidden', aspectRatio: '16 / 10' }}><img src={cdUI} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></div></div>
+    </div>
   )
   return null
 }
