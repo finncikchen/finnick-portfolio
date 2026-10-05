@@ -225,8 +225,12 @@ function Cover({ id, hovered }) {
   const bg = (filter) => <div style={{ position: 'absolute', inset: 0, background: `url(${glassBg}) center / cover`, filter }} />
   if (id === 'bosch') return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      {bg('hue-rotate(28deg) saturate(0.45) brightness(1.05)')}
-      <div style={{ ...frame, width: '70%', top: '54%' }}><div style={{ borderRadius: 6, overflow: 'hidden' }}><Scaled><BoschDashboard /></Scaled></div></div>
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 55% 70% at 0% 0%, rgba(226,0,21,0.10) 0%, rgba(226,0,21,0) 70%), radial-gradient(ellipse 60% 80% at 100% 100%, rgba(0,98,163,0.14) 0%, rgba(0,98,163,0) 70%), linear-gradient(160deg, #f4f5f7 0%, #e6e9ee 100%)' }} />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(20,30,50,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(20,30,50,0.05) 1px, transparent 1px)', backgroundSize: '24px 24px', maskImage: 'radial-gradient(ellipse 70% 70% at 50% 40%, #000 0%, transparent 80%)', WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 40%, #000 0%, transparent 80%)' }} />
+      <div style={{ position: 'absolute', left: '14%', right: '14%', top: '14%', borderRadius: '8px 8px 0 0', overflow: 'hidden', background: '#fff', boxShadow: '0 0 0 1px rgba(20,30,50,0.06), 0 18px 40px rgba(20,30,60,0.14)', transition: 'transform 0.5s ease', transform: hovered ? 'translateY(-4%)' : 'none' }}>
+        <div style={{ height: 3, background: 'linear-gradient(90deg, #e20015, #9e2896, #0062a3, #00a8b0, #78be20)' }} />
+        <Scaled><BoschDashboard /></Scaled>
+      </div>
     </div>
   )
   if (id === 'bytedance') return (
