@@ -24,40 +24,40 @@ const SANS    = 'Inter, sans-serif'
 
 const PROJECTS = [
   {
-    id: 'cisco', title: 'Cisco Intersight',
-    subtitle: 'Insight to Action — Header Design',
-    tags: ['Enterprise', 'SaaS'], year: '2026',
+    id: 'cisco', title: 'Cisco · Intersight',
+    subtitle: 'Making AI actionable in complex infrastructure operations.',
+    tags: ['AI Decision Support', 'Enterprise Systems'], year: '2026',
     category: 'products', thumb: null, objectPos: 'center center',
     gradient: 'radial-gradient(ellipse 70% 80% at 8% 10%, rgba(150,225,250,0.85) 0%, transparent 65%), radial-gradient(ellipse 60% 70% at 95% 95%, rgba(140,165,245,0.7) 0%, transparent 65%), radial-gradient(ellipse 45% 45% at 70% 25%, rgba(255,255,255,0.9) 0%, transparent 70%), linear-gradient(160deg, #e3f1fb 0%, #c9dcf5 55%, #d9e2f8 100%)',
   },
   {
-    id: 'bosch', title: 'Bosch',
-    subtitle: 'Finance Operations Dashboard',
-    tags: ['Enterprise', 'FinTech'], year: '2025',
+    id: 'bosch', title: 'Bosch · Down Payment & Deposit Platform',
+    subtitle: 'Turning manual financial clearing into one streamlined workflow.',
+    tags: ['Financial Operations', 'Workflow Automation'], year: '2025',
     category: 'products', thumb: thumbBosch, cover: true, objectPos: 'center 30%',
   },
   {
-    id: 'bytedance', title: 'ByteDance',
-    subtitle: 'Internal Operations Platform',
-    tags: ['Enterprise', 'B2B'], year: '2024',
+    id: 'bytedance', title: 'ByteDance · Robot Management System',
+    subtitle: 'Connecting operators with fleets of autonomous robots.',
+    tags: ['Human–Robot Interaction', 'Fleet Operations'], year: '2024',
     category: 'products', thumb: thumbBytedance, cover: true, objectPos: 'center center',
   },
   {
-    id: 'yhlo', title: 'YHLO',
-    subtitle: 'Medical Device UX System',
-    tags: ['Healthcare', 'Hardware'], year: '2024',
+    id: 'yhlo', title: 'YHLO · iTLA',
+    subtitle: 'Making complex lab automation safer and easier to operate.',
+    tags: ['Safety-Critical UX', 'Human–Machine Interaction'], year: '2024',
     category: 'products', thumb: thumbYhlo, cover: true, objectPos: 'center center',
   },
   {
     id: 'flower-star', title: 'Flower Star',
-    subtitle: 'Consumer Mobile Experience',
-    tags: ['Consumer', 'Mobile'], year: '2025',
+    subtitle: 'An original mobile game designed from concept to play.',
+    tags: ['Game Design', 'Interaction'], year: '2025',
     category: 'visuals', thumb: thumbFlowerStar, cover: true, objectPos: 'center top',
   },
   {
     id: 'color-diary', title: 'Color Diary',
-    subtitle: 'Vibe-Coded Cover Generator',
-    tags: ['Vibe Coding', 'Web App'], year: '2026',
+    subtitle: 'A vibe-coded cover generator reaching 80K+ views on RedNote.',
+    tags: ['Vibe Coding', '8K+ Likes & Saves'], year: '2026',
     category: 'visuals', thumb: thumbColorDiary, cover: true, objectPos: 'center center',
     url: 'https://colordiary.finnickchen.site/',
   },
@@ -457,14 +457,14 @@ function ProjectCard({ project: p, index, visible }) {
           transition: 'background 0.28s',
         }} />
 
-        <div style={{ display: 'flex', gap: '6px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {p.tags.map(t => (
             <span key={t} style={{
               fontFamily: SANS, fontWeight: 400, fontSize: '10px',
               letterSpacing: '0.05em',
               color: hovered ? '#fff' : 'rgba(255,255,255,0.6)',
               border: `1px solid ${hovered ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.22)'}`,
-              borderRadius: '100px', padding: '3px 11px',
+              borderRadius: '100px', padding: '3px 11px', whiteSpace: 'nowrap',
               transition: 'color 0.22s, border-color 0.22s',
             }}>
               {t}
