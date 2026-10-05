@@ -26,3 +26,4 @@ dist-ssr
 
 # Scratch Figma export references (not part of the site build)
 figma-exports/
+.vercel
