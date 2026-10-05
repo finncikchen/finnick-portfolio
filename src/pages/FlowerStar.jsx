@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import { F, W, WIDE, GRAIN } from '../components/caseTokens'
 import cover from '../assets/images/flowerstar/cover.png'
-import finale from '../assets/images/flowerstar/finale.jpg'
 import cast from '../assets/images/flowerstar/cast.png'
 import boni from '../assets/images/flowerstar/boni.png'
 import fish from '../assets/images/flowerstar/fish.png'
@@ -84,7 +83,6 @@ const STAGES = [
   ['02', 'Power Struggle', 'Differences surface. Obstacles close in and the first real conflict with the octopus begins.', l2],
   ['03', 'Integration', 'Acceptance. The player learns to read the currents and work with them instead of against them.', l3],
   ['04', 'Commitment', 'Choosing each other in the dark. The deepest level asks for patience over speed.', l4],
-  ['05', 'Co-creation', 'Love turns outward. Boni shares the flower star and lights up the whole ocean together.', finale],
 ]
 
 const PERSONAS = [
@@ -201,7 +199,7 @@ export default function FlowerStar() {
 
       {/* Levels */}
       <section style={{ paddingTop: 'clamp(96px, 12vw, 160px)' }}>
-        <Head eyebrow="Level Design" title="Five levels, five stages of intimacy." sub="Built on Susan Campbell's model, each level's color and mechanics mirror what a couple goes through." />
+        <Head eyebrow="Level Design" title="Four levels, four stages of intimacy." sub="Built on Susan Campbell's model, each level's color and mechanics mirror what a couple goes through." />
         <div style={{ ...WIDE, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {STAGES.map(([n, t, d, img]) => (
             <div key={n} style={{ position: 'relative', borderRadius: 24, overflow: 'hidden', minHeight: 240, background: `url(${img}) center / cover` }}>
