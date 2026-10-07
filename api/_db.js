@@ -1,7 +1,7 @@
 /* global process */
 import { neon } from '@neondatabase/serverless'
 
-export const sql = neon(process.env.DATABASE_URL)
+export const sql = neon(process.env.DATABASE_URL_DATABASE_URL || process.env.DATABASE_URL)
 
 let ready
 // Creates the events table on first use. One row per tracked event; no IPs are stored.
