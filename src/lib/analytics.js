@@ -12,12 +12,13 @@ const enabled = () => typeof window !== 'undefined' && !/^(localhost|127\.0\.0\.
 let vid, sid, queue = [], page = null
 
 function send(force) {
+  if (optedOut()) { queue = []; return }
   if (!queue.length) return
   const body = JSON.stringify({ events: queue.splice(0) })
   if (force && navigator.sendBeacon) navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }))
   else fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {})
 }
-const push = (type, extra) => { queue.push({ vid, sid, type, path: page?.path || location.pathname, ...extra }) }
+const push = (type, extra) => { if (optedOut()) { queue = []; return } queue.push({ vid, sid, type, path: page?.path || location.pathname, ...extra }) }
 
 function closePage() {
   if (!page) return
