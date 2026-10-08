@@ -143,7 +143,7 @@ export default function About() {
       <section style={{ flex: '1 1 0', minWidth: 0, maxWidth: 620 }}>
         <h1 style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(44px, 6vw, 72px)', lineHeight: 1, letterSpacing: '-0.02em', margin: '0 0 32px' }}>Hi, I'm Finnick.</h1>
         <p style={{ fontFamily: F, fontSize: 19, lineHeight: '31px', color: SUB, margin: '0 0 22px' }}>
-          I'm a product designer who's curious about how people experience things, and how small details shape those moments. Most recently I worked on <span style={{ color: INK }}>Cisco</span> Intersight, and before that designed internal platforms at <span style={{ color: INK }}>ByteDance</span> and <span style={{ color: INK }}>Bosch</span>.
+          I'm a product designer who's curious about how people experience things, and how small details shape those moments. Most recently I worked on <span style={{ color: INK }}>Cisco</span> Intersight, and before that designed internal platforms at <span style={{ color: INK }}>TikTok</span> and <span style={{ color: INK }}>Bosch</span>.
         </p>
         <p style={{ fontFamily: F, fontSize: 19, lineHeight: '31px', color: SUB, margin: 0 }}>
           I grew up in Chengdu, a city where different rhythms of life coexist naturally. It taught me to observe quietly and notice how environments shape the way people feel. Today I'm finishing my Master's in HCI at the <span style={{ color: INK }}>University of Washington</span>.

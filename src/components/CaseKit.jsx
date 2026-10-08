@@ -170,7 +170,7 @@ export function ContactCTA() {
 
 // Case-study order, matching the home page grid; the last one loops back to the first
 export const CASE_ORDER = [
-  ['/work/cisco', 'Cisco'], ['/work/bosch', 'Bosch'], ['/work/bytedance', 'ByteDance'],
+  ['/work/cisco', 'Cisco'], ['/work/bosch', 'Bosch'], ['/work/bytedance', 'TikTok'],
   ['/work/yhlo', 'YHLO'], ['/work/flower-star', 'Flower Star'],
 ]
 

@@ -15,7 +15,7 @@ const PROJECTS = [
   {
     id: 'bytedance',
     index: '01',
-    title: 'ByteDance',
+    title: 'TikTok',
     subtitle: 'Internal Operations Platform',
     desc: 'Redesigned internal tools serving 10,000+ daily users across operations, logistics, and compliance teams — reducing task completion time by 40%.',
     tags: ['Enterprise', 'B2B', 'Data Platform', 'Dashboard'],

@@ -37,7 +37,7 @@ const PROJECTS = [
     category: 'products', thumb: thumbBosch, cover: true, objectPos: 'center 30%',
   },
   {
-    id: 'bytedance', title: 'ByteDance · Robot Management System',
+    id: 'bytedance', title: 'TikTok · Robot Management System',
     subtitle: 'Connecting operators with fleets of autonomous robots.',
     tags: ['Human–Robot Interaction', 'Fleet Operations'], year: '2024',
     category: 'products', thumb: thumbBytedance, cover: true, objectPos: 'center center',

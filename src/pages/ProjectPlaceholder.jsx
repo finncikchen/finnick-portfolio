@@ -4,7 +4,7 @@ import Footer from '../components/Footer'
 import homeBg from '../assets/images/home-bg.png'
 
 const projectMeta = {
-  bytedance: { title: 'ByteDance', subtitle: 'Internal Platform · Operational Tools' },
+  bytedance: { title: 'TikTok', subtitle: 'Internal Platform · Operational Tools' },
   bosch: { title: 'Bosch', subtitle: 'Internal Platform · Operational Tools' },
   yhlo: { title: 'YHLO', subtitle: 'Product Design' },
   'flower-star': { title: 'Flower Star', subtitle: 'Consumer Product Design' },
