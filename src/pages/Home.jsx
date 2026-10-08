@@ -45,7 +45,7 @@ const PROJECTS = [
   {
     id: 'yhlo', title: 'YHLO · iTLA',
     subtitle: 'Making complex lab automation safer and easier to operate.',
-    tags: ['Safety-Critical UX', 'Human–Machine Interaction'], year: '2024',
+    tags: ['Healthcare UX', 'Human–Machine Interaction'], year: '2024',
     category: 'products', thumb: thumbYhlo, cover: true, objectPos: 'center center',
   },
   {
