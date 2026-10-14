@@ -45,7 +45,7 @@ const PROJECTS = [
   {
     id: 'yhlo', title: 'YHLO · iTLA',
     subtitle: 'Making complex lab automation safer and easier to operate.',
-    tags: ['Safety-Critical UX', 'Human–Machine Interaction'], year: '2024',
+    tags: ['Healthcare UX', 'Human–Machine Interaction'], year: '2024',
     category: 'products', thumb: thumbYhlo, cover: true, objectPos: 'center center',
   },
   {
@@ -179,7 +179,7 @@ export default function Home() {
             lineHeight: 1.2, letterSpacing: '0em',
             color: '#edf0f7', margin: '0 0 16px',
           }}>
-            Finnick is a Product Designer based in Seattle. Worked at Cisco, TikTok, and Bosch.
+            Finnick is a Product Designer based in Seattle. Worked at Cisco, ByteDance, and Bosch.
           </h1>
           <p style={{
             fontFamily: SANS, fontWeight: 300,

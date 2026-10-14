@@ -8,7 +8,7 @@ import {
 } from '../components/CaseKit'
 
 import imgHeroBg       from '../assets/images/bytedance/hero-bg.webp'
-import imgTikTok       from '../assets/images/bytedance/tiktok-logo.png'
+import imgByteDance    from '../assets/images/bytedance/bytedance-logo.png'
 import resPicker       from '../assets/images/bytedance/research/r1.webp'
 import resAisle        from '../assets/images/bytedance/research/r2.webp'
 import resCart         from '../assets/images/bytedance/research/r3.webp'
@@ -244,7 +244,7 @@ export default function ByteDance() {
         bgImage={imgHeroBg}
         light
         logoColor="#1d1d1f"
-        brand={<img src={imgTikTok} alt="TikTok" style={{ height: 30, display: 'block', marginBottom: 28 }} />}
+        brand={<img src={imgByteDance} alt="ByteDance" style={{ height: 36, display: 'block', marginBottom: 28 }} />}
         title="Smarter dispatching"
         sub="for 100+ warehouse robots"
       >
