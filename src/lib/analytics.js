@@ -68,7 +68,9 @@ export function initAnalytics() {
   document.addEventListener('click', e => {
     const el = e.target.closest('a, button, [data-track], video, iframe')
     if (!el) return
-    const label = el.dataset?.track || el.getAttribute('aria-label') || (el.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 60)
+    const href = el.tagName === 'A' ? el.getAttribute('href') : null
+    const internal = href && href.startsWith('/') ? href : null
+    const label = el.dataset?.track || internal || el.getAttribute('aria-label') || (el.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 60)
       || el.getAttribute('alt') || el.getAttribute('href') || el.tagName.toLowerCase()
     push('click', { label })
     send()

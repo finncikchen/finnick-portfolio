@@ -7,10 +7,15 @@ const PAGE_NAMES = {
   '/work/bosch': 'Bosch', '/work/yhlo': 'YHLO', '/work/flower-star': 'Flower Star',
 }
 const name = p => PAGE_NAMES[p] || p
+// Cloud data-center towns: traffic from here is almost always crawlers, link previewers or uptime bots.
+const DATACENTER = /^(Boydton|Des Moines|Council Bluffs|Ashburn|The Dalles|Quincy|Prineville|Forest City|Altoona|Papillion|Lenoir|Moncks Corner|Pryor|Mayes County|Clarksville|New Albany|Columbus|Santa Clara|North Charleston|Dublin|Hillsboro|Boardman)$/i
+// Clicks on internal links are stored as their path; show them as "Opened Cisco".
+const clickLabel = l => (l && l.startsWith('/') ? `Opened ${name(l)}` : l)
 
 // Aggregated traffic for the /admin dashboard. Protected by the ADMIN_KEY env var.
 export default async function handler(req, res) {
   if (!process.env.ADMIN_KEY || req.headers['x-admin-key'] !== process.env.ADMIN_KEY) return res.status(401).json({ error: 'unauthorized' })
+  if (req.query.grid === 'week') return res.json(await weekGrid(parseInt(req.query.week) || 0))
   const days = Math.min(Math.max(parseInt(req.query.days) || 7, 1), 90)
   await ensureSchema()
 
@@ -68,12 +73,93 @@ export default async function handler(req, res) {
     workReachRate: Math.round((sessions.filter(s => s.saw_work).length / n) * 100),
   }
   const pagesNamed = pages.map(p => ({ ...p, name: name(p.path) }))
+  const visits = await visitLog(days)
 
   res.setHeader('Cache-Control', 'no-store')
   res.json({
-    days, summary, hourly, daily, weekly, hourOfDay, cities, pages: pagesNamed, clicks, referrers, devices,
+    days, summary, visits, hourly, daily, weekly, hourOfDay, cities, pages: pagesNamed, clicks: clicks.map(c => ({ ...c, label: clickLabel(c.label) })), referrers, devices,
     insights: insights({ summary, pages: pagesNamed, referrers, devices, hourOfDay, clicks, cities }),
   })
+}
+
+// One entry per visit, newest first: who, where, when, and the page-by-page path with time spent,
+// scroll depth and clicks. A visit is one visitor's activity with no gap longer than 30 minutes,
+// so several tabs opened together count as one visit.
+const GAP_MS = 30 * 60 * 1000
+async function visitLog(days) {
+  const rows = await sql`
+    WITH active AS (SELECT DISTINCT vid FROM events WHERE ts > now() - make_interval(days => ${days}))
+    SELECT e.vid, e.ts, e.type, e.path, e.label, e.value, e.referrer, e.city, e.region, e.country, e.device
+    FROM events e JOIN active USING (vid) ORDER BY e.vid, e.ts, e.id`
+  const cutoff = Date.now() - days * 86400000
+  const out = []
+  let cur = null, prevVid = null, prevTs = 0, n = 0
+  const perVid = {}
+  for (const r of rows) {
+    const t = new Date(r.ts).getTime()
+    if (r.vid !== prevVid || t - prevTs > GAP_MS) {
+      n = r.vid === prevVid ? n + 1 : 1
+      cur = { vid: r.vid, start: r.ts, end: r.ts, city: r.city, region: r.region, country: r.country, device: r.device,
+              source: null, visitNo: n, pages: [] }
+      out.push(cur)
+      perVid[r.vid] = n
+    }
+    prevVid = r.vid; prevTs = t
+    cur.end = r.ts
+    cur.city ??= r.city; cur.country ??= r.country; cur.region ??= r.region
+    const last = cur.pages[cur.pages.length - 1]
+    if (r.type === 'pageview') {
+      if (cur.source == null) cur.source = r.referrer || 'Direct'
+      cur.pages.push({ path: r.path, name: name(r.path), at: r.ts, secs: 0, scroll: null, clicks: [] })
+      continue
+    }
+    // Attach to the current page, or to the latest view of that path if it arrived late from another tab.
+    const seg = last && last.path === r.path ? last : [...cur.pages].reverse().find(p => p.path === r.path) || last
+    if (!seg) continue
+    if (r.type === 'duration') seg.secs += r.value || 0
+    if (r.type === 'scroll') seg.scroll = Math.max(seg.scroll ?? 0, r.value ?? 0)
+    if (r.type === 'click' && r.label) seg.clicks.push(clickLabel(r.label))
+  }
+  return out
+    .filter(v => v.pages.length && new Date(v.start).getTime() > cutoff)
+    .map(v => ({
+      ...v,
+      totalVisits: perVid[v.vid],
+      totalSecs: v.pages.reduce((a, p) => a + p.secs, 0),
+      // Likely bot: comes from a cloud data-center town rather than a real ISP location.
+      likelyBot: DATACENTER.test(v.city || ''),
+    }))
+    .sort((a, b) => new Date(b.start) - new Date(a.start))
+    .slice(0, 300)
+}
+
+// Visitors per hour for one calendar week (Mon–Sun, Pacific). week=0 is this week, 1 last week, etc.
+// Data-center bot traffic is left out.
+async function weekGrid(week) {
+  week = Math.min(Math.max(week, 0), 104)
+  const rows = await sql`
+    WITH bounds AS (
+      SELECT date_trunc('week', now() AT TIME ZONE ${TZ}) - make_interval(weeks => ${week}) AS lo)
+    SELECT to_char(ts AT TIME ZONE ${TZ}, 'YYYY-MM-DD') AS d, extract(hour FROM ts AT TIME ZONE ${TZ})::int AS h,
+           count(DISTINCT vid)::int AS v, (SELECT to_char(lo, 'YYYY-MM-DD') FROM bounds) AS lo
+    FROM events, bounds
+    WHERE ts AT TIME ZONE ${TZ} >= lo AND ts AT TIME ZONE ${TZ} < lo + interval '7 days'
+      AND NOT coalesce(city, '') ~* ${DATACENTER.source}
+    GROUP BY 1, 2`
+  const lo = rows[0]?.lo || (await sql`SELECT to_char(date_trunc('week', now() AT TIME ZONE ${TZ}) - make_interval(weeks => ${week}), 'YYYY-MM-DD') AS lo`)[0].lo
+  const perDay = await sql`
+    SELECT to_char(ts AT TIME ZONE ${TZ}, 'YYYY-MM-DD') AS d, count(DISTINCT vid)::int AS v FROM events
+    WHERE ts AT TIME ZONE ${TZ} >= ${lo}::timestamp AND ts AT TIME ZONE ${TZ} < ${lo}::timestamp + interval '7 days'
+      AND NOT coalesce(city, '') ~* ${DATACENTER.source}
+    GROUP BY 1`
+  const start = new Date(lo + 'T00:00:00Z')
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start.getTime() + i * 86400000).toISOString().slice(0, 10)
+    const hours = Array(24).fill(0)
+    rows.filter(r => r.d === d).forEach(r => { hours[r.h] = r.v })
+    return { date: d, hours, total: perDay.find(r => r.d === d)?.v || 0 }
+  })
+  return { week, start: lo, days }
 }
 
 // Rule-based observations and suggestions. Each rule only fires with enough data to mean something.

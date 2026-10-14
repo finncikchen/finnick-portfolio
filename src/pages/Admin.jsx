@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 const SANS = 'Inter, sans-serif'
 const C = { bg: '#f6f7f9', card: '#fff', ink: '#14161b', sub: '#6b7180', line: '#e7e9ee', accent: '#3b6cf6', good: '#16a34a', warn: '#d97706', info: '#3b6cf6' }
 const fmt = s => (s == null ? '–' : s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`)
-const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function Card({ title, children, span = 1 }) {
   return (
@@ -33,21 +32,43 @@ function Bars({ data, label }) {
   )
 }
 
-function Heat({ cells }) {
-  const max = Math.max(1, ...cells.map(c => c.v))
-  const get = (d, h) => cells.find(c => c.dow === d && c.h === h)?.v || 0
+function WeekHeat({ adminKey }) {
+  const [week, setWeek] = useState(0)
+  const [grid, setGrid] = useState(null)
+  useEffect(() => {
+    let live = true
+    fetch(`/api/stats?grid=week&week=${week}`, { headers: { 'x-admin-key': adminKey } })
+      .then(r => (r.ok ? r.json() : null)).then(g => { if (live) setGrid(g) })
+    return () => { live = false }
+  }, [week, adminKey])
+  const max = Math.max(1, ...(grid?.days || []).flatMap(d => d.hours))
+  const label = d => new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' })
+  const range = grid ? `${label(grid.days[0].date)} – ${label(grid.days[6].date)}` : ''
+  const btn = dis => ({ border: `1px solid ${C.line}`, background: C.card, borderRadius: 6, padding: '4px 10px', fontSize: 13, cursor: dis ? 'default' : 'pointer', opacity: dis ? 0.4 : 1, fontFamily: SANS })
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '32px repeat(24, minmax(10px, 1fr))', gap: 2, fontSize: 10, color: C.sub, minWidth: 360 }}>
-        <span />{Array.from({ length: 24 }, (_, h) => <span key={h} style={{ textAlign: 'center' }}>{h % 6 === 0 ? h : ''}</span>)}
-        {DOW.map((d, i) => [
-          <span key={d}>{d}</span>,
-          ...Array.from({ length: 24 }, (_, h) => {
-            const v = get(i, h)
-            return <div key={d + h} title={`${d} ${h}:00 · ${v}`} style={{ aspectRatio: '1', borderRadius: 2, background: v ? `rgba(59,108,246,${0.15 + 0.85 * (v / max)})` : '#f0f1f4' }} />
-          }),
-        ])}
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        <button style={btn(false)} onClick={() => setWeek(w => w + 1)}>← Earlier</button>
+        <button style={btn(week === 0)} disabled={week === 0} onClick={() => setWeek(w => Math.max(0, w - 1))}>Later →</button>
+        <span style={{ fontSize: 13, fontWeight: 600 }}>{week === 0 ? 'This week' : week === 1 ? 'Last week' : `${week} weeks ago`}</span>
+        <span style={{ fontSize: 13, color: C.sub }}>{range}</span>
       </div>
+      {!grid ? <Empty /> : (
+        <div style={{ overflowX: 'auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '96px repeat(24, minmax(12px, 1fr)) 44px', gap: 2, fontSize: 10, color: C.sub, minWidth: 560, alignItems: 'center' }}>
+            <span />{Array.from({ length: 24 }, (_, h) => <span key={h} style={{ textAlign: 'center' }}>{h % 3 === 0 ? (h === 0 ? '12a' : h < 12 ? `${h}a` : h === 12 ? '12p' : `${h - 12}p`) : ''}</span>)}<span style={{ textAlign: 'right' }}>people</span>
+            {grid.days.map(d => [
+              <span key={d.date} style={{ fontSize: 12, color: C.ink }}>{label(d.date)}</span>,
+              ...d.hours.map((v, h) => (
+                <div key={d.date + h} title={`${label(d.date)}, ${h}:00–${h + 1}:00 · ${v} ${v === 1 ? 'person' : 'people'}`}
+                  style={{ aspectRatio: '1', borderRadius: 2, background: v ? `rgba(59,108,246,${0.2 + 0.8 * (v / max)})` : '#f0f1f4' }} />
+              )),
+              <span key={d.date + 't'} style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: d.total ? C.ink : C.sub }}>{d.total}</span>,
+            ])}
+          </div>
+        </div>
+      )}
+      <p style={{ margin: '10px 0 0', fontSize: 11, color: C.sub }}>Pacific time. Hover a square for the exact hour. Bots from data centers are excluded.</p>
     </div>
   )
 }
@@ -63,6 +84,62 @@ function Table({ cols, rows }) {
 }
 
 const Empty = () => <p style={{ margin: 0, fontSize: 13, color: C.sub }}>No data yet.</p>
+
+const when = t => new Date(t).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+const ago = t => { const m = Math.round((Date.now() - new Date(t)) / 60000); return m < 60 ? `${m}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago` }
+const place = v => [v.city, v.region, v.country].filter(Boolean).join(', ') || 'Unknown location'
+
+function VisitLog({ visits: all }) {
+  const [open, setOpen] = useState(null)
+  const [showBots, setShowBots] = useState(false)
+  if (!all?.length) return <Empty />
+  const bots = all.filter(v => v.likelyBot).length
+  const visits = showBots ? all : all.filter(v => !v.likelyBot)
+  return (
+    <div style={{ display: 'grid', gap: 8, overflowX: 'auto' }}>
+      {bots > 0 && (
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: C.sub, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showBots} onChange={e => setShowBots(e.target.checked)} />
+          Show {bots} likely bot visit{bots > 1 ? 's' : ''} (from cloud data-center locations)
+        </label>
+      )}
+      {!visits.length && <Empty />}
+      {visits.map(v => {
+        const isOpen = open === (v.vid + v.start)
+        return (
+          <div key={(v.vid + v.start)} style={{ minWidth: 680, border: `1px solid ${C.line}`, borderRadius: 10, background: isOpen ? '#fafbfc' : C.card }}>
+            <button onClick={() => setOpen(isOpen ? null : (v.vid + v.start))} style={{ all: 'unset', boxSizing: 'border-box', width: '100%', cursor: 'pointer', padding: '12px 14px', display: 'grid', gridTemplateColumns: '190px 110px minmax(150px, 1fr) 64px 110px 14px', gap: 12, alignItems: 'center', fontFamily: SANS, fontSize: 13 }}>
+              <span style={{ whiteSpace: 'nowrap' }}><strong style={{ fontWeight: 600 }}>{when(v.start)}</strong><span style={{ color: C.sub }}> · {ago(v.start)}</span></span>
+              <span style={{ whiteSpace: 'nowrap' }}><span style={{ color: C.sub }}>Stayed </span><strong style={{ fontWeight: 600 }}>{fmt(v.totalSecs)}</strong><span style={{ color: C.sub }}> · {v.pages.length} pg</span></span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{place(v)}{v.likelyBot && <span style={{ marginLeft: 6, fontSize: 11, color: C.warn }}>likely bot</span>}</span>
+              <span style={{ color: C.sub }}>{v.device}</span>
+              <span style={{ color: v.visitNo > 1 ? C.good : C.sub, whiteSpace: 'nowrap' }}>{v.visitNo > 1 ? `Return visit #${v.visitNo}` : 'First visit'}</span>
+              <span style={{ color: C.sub, transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform .15s' }}>›</span>
+            </button>
+            {isOpen && (
+              <div style={{ padding: '0 14px 14px' }}>
+                <p style={{ margin: '0 0 10px', fontSize: 12, color: C.sub }}>Came from <strong style={{ color: C.ink, fontWeight: 500 }}>{v.source || 'Direct'}</strong> · left {when(v.end)}</p>
+                <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 6 }}>
+                  {v.pages.map((p, i) => (
+                    <li key={i} style={{ display: 'grid', gridTemplateColumns: '72px 96px 1fr', gap: 12, alignItems: 'baseline', fontSize: 13, padding: '8px 10px', background: C.card, border: `1px solid ${C.line}`, borderRadius: 8 }}>
+                      <span style={{ color: C.sub, fontVariantNumeric: 'tabular-nums' }}>{new Date(p.at).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit' })}</span>
+                      <span style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}><span style={{ color: C.sub }}>stayed </span><strong style={{ fontWeight: 600 }}>{fmt(p.secs)}</strong></span>
+                      <span>
+                        <strong style={{ fontWeight: 600 }}>{p.name}</strong>
+                        {p.scroll != null && <span style={{ color: C.sub }}> · scrolled {p.scroll}%</span>}
+                        {p.clicks.length > 0 && <span style={{ display: 'block', marginTop: 3, color: C.sub, fontSize: 12 }}>Clicked: {p.clicks.join(', ')}</span>}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 function Kpi({ label, value, note }) {
   return (
@@ -151,13 +228,17 @@ export default function Admin() {
               </div>
             </section>
 
+            <div style={{ gridColumn: '1 / -1' }}>
+              <Card title={`Every visit · ${data.visits?.filter(v => !v.likelyBot).length || 0} people in this period · click one to see its path`}><VisitLog visits={data.visits} /></Card>
+            </div>
+
             <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: 16 }}>
               <Card title="Visitors per hour · last 48h"><Bars data={data.hourly} label={t => `${t.slice(5, 10)} ${t.slice(11)}:00`} /></Card>
               <Card title="Visitors per day · last 30 days"><Bars data={data.daily} label={t => t.slice(5)} /></Card>
               <Card title="Visitors per week · last 12 weeks"><Bars data={data.weekly} label={t => `wk of ${t.slice(5)}`} /></Card>
             </div>
 
-            <div style={{ gridColumn: '1 / -1' }}><Card title="When people visit · day × hour"><Heat cells={data.hourOfDay} /></Card></div>
+            <div style={{ gridColumn: '1 / -1' }}><Card title="When people visit · by date and hour"><WeekHeat adminKey={key} /></Card></div>
 
             <div style={{ gridColumn: '1 / -1' }}>
               <Card title="Pages · time on page and scroll depth">
