@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { CASE_ORDER } from './CaseKit'
 import logo from '../assets/images/logo.svg'
-import avatar from '../assets/images/profile.png'
+import avatar from '../assets/images/avatar-contact.png'
 
 const SANS = 'Inter, sans-serif'
 const EMAIL = 'c4han@uw.edu'
@@ -203,7 +203,7 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)' }}
             onMouseLeave={e => { if (!open) e.currentTarget.style.background = 'transparent' }}
           >
-            <img src={avatar} alt="Finnick" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top' }} />
+            <img src={avatar} alt="Finnick" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
             Contact me
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"
               style={{ transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
