@@ -284,10 +284,10 @@ export default function ByteDance() {
 
       {/* ── IMPACT ── */}
       <section style={{ paddingBottom: GAP }}>
-        <ChapterHead eyebrow="Impact" title="Operators got a system they liked using." sub="NPS rose to 86 after launch." />
+        <ChapterHead eyebrow="Impact" title="From fragmented workflows to faster robot operations." sub="Reduced task dispatch delays by 42%." />
         <div style={WIDE}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '32px 48px' }}>
-            {[['86', 'NPS score', 'User satisfaction after launch'], ['100+', 'Robots', 'Monitored in real time'], ['−40%', 'Task time', 'Less time to complete tasks']].map(([n, t, d]) => (
+            {[['−42%', 'Dispatch Delay', 'Faster task dispatch'], ['+18%', 'Task Efficiency', 'Improved operator workflows'], ['100+', 'Robots Managed', 'Real-time fleet monitoring']].map(([n, t, d]) => (
               <div key={t} style={{ borderTop: '1px solid rgba(0,0,0,0.12)', paddingTop: 20 }}>
                 <p style={{ fontFamily: F, fontWeight: 500, fontSize: 'clamp(48px, 6vw, 80px)', letterSpacing: '-0.05em', lineHeight: 1, color: INK, margin: '0 0 12px' }}>{n}</p>
                 <p style={{ fontFamily: F, fontSize: 16, fontWeight: 500, color: INK, margin: '0 0 2px' }}>{t}</p>
