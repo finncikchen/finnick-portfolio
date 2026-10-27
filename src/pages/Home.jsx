@@ -20,7 +20,7 @@ import thumbColorDiary from '../assets/images/thumb-colordiary.webp'
 
 const SERIF   = '"Cormorant Garamond", serif'
 const DISPLAY = '"Playfair Display", serif'
-const SANS    = 'Inter, sans-serif'
+const SANS    = '"Manrope", "Inter", sans-serif'
 
 const PROJECTS = [
   {
@@ -165,7 +165,7 @@ export default function Home() {
         <Header />
 
         {/* ── HERO ── */}
-        <section style={{ padding: '60px 48px 48px', maxWidth: '1160px', margin: '0 auto' }}>
+        <section style={{ padding: 'clamp(56px, 7vw, 104px) clamp(20px, 8vw, 160px) clamp(48px, 5vw, 72px)', maxWidth: '1120px', margin: '0 auto', boxSizing: 'content-box' }}>
           {/* verified badge */}
           <div style={{ marginBottom: 20 }}>
             <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -175,27 +175,27 @@ export default function Home() {
           </div>
           <h1 style={{
             fontFamily: DISPLAY, fontWeight: 400,
-            fontSize: 'clamp(26px, 3.2vw, 46px)',
-            lineHeight: 1.2, letterSpacing: '0em',
-            color: '#edf0f7', margin: '0 0 16px',
+            fontSize: 'clamp(28px, 3.4vw, 48px)',
+            lineHeight: 1.18, letterSpacing: '-0.01em',
+            color: '#edf0f7', margin: '0 0 20px', maxWidth: 1000,
           }}>
             Finnick is a Product Designer based in Seattle. Worked at Cisco, ByteDance, and Bosch.
           </h1>
           <p style={{
             fontFamily: SANS, fontWeight: 300,
-            color: 'rgba(228,228,228,0.9)', margin: 0, lineHeight: 1.5, fontSize: '18px',
+            color: 'rgba(228,232,240,0.62)', margin: 0, lineHeight: 1.6, fontSize: '18px',
           }}>
             Experience across AI, B2B SaaS, and enterprise platforms.
           </p>
         </section>
 
         {/* ── FILTER + GRID ── */}
-        <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 48px 96px' }}>
+        <div style={{ maxWidth: '1120px', margin: '0 auto', padding: '0 clamp(20px, 8vw, 160px) clamp(96px, 10vw, 160px)', boxSizing: 'content-box' }}>
 
           {/* filter row */}
           <div style={{
             display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', marginBottom: '24px',
+            justifyContent: 'space-between', marginBottom: '32px',
           }}>
             <FilterTabs filter={filter} onChange={setFilter} />
             <span style={{ fontFamily: SANS, fontSize: '15px', color: 'rgba(255,255,255,0.45)' }}>
@@ -204,7 +204,8 @@ export default function Home() {
           </div>
 
           {/* 2 × 2 grid — fixed, no layout changes */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+          <style>{'.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,2.4vw,32px)}@media(max-width:760px){.home-grid{grid-template-columns:1fr}}'}</style>
+          <div className="home-grid">
             {filtered.map((p, i) => (
               <ProjectCard key={p.id} project={p} index={i} visible={visible} />
             ))}
@@ -297,40 +298,45 @@ function ProjectCard({ project: p, index, visible }) {
       onMouseLeave={handleMouseLeave}
       style={{
         display: 'block', textDecoration: 'none',
-        borderRadius: '14px', overflow: 'hidden',
-        background: 'rgba(8,11,22,0.82)',
-        backdropFilter: 'blur(2px)',
-        border: `1px solid ${hovered ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)'}`,
+        borderRadius: '22px', overflow: 'hidden', padding: 6,
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+        border: `1px solid ${hovered ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.06)'}`,
         boxShadow: hovered
-          ? '0 24px 52px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.07)'
-          : '0 2px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)',
+          ? '0 30px 60px -20px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)'
+          : '0 10px 30px -18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
         opacity: visible ? 1 : 0,
+        translate: visible ? '0 0' : '0 28px',
+        filter: visible ? 'none' : 'blur(6px)',
         willChange: 'transform',
         transition: [
-          `opacity 0.6s ease ${0.07 * index}s`,
-          'border-color 0.28s',
-          'box-shadow 0.36s',
+          `opacity 0.9s cubic-bezier(0.32,0.72,0,1) ${0.08 * index}s`,
+          `translate 0.9s cubic-bezier(0.32,0.72,0,1) ${0.08 * index}s`,
+          `filter 0.9s cubic-bezier(0.32,0.72,0,1) ${0.08 * index}s`,
+          'border-color 0.4s cubic-bezier(0.32,0.72,0,1)',
+          'box-shadow 0.5s cubic-bezier(0.32,0.72,0,1)',
         ].join(', '),
         // smooth return when mouse leaves
         ...(hovered ? {} : { transition: [
-          `opacity 0.6s ease ${0.07 * index}s`,
-          'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94)',
-          'border-color 0.28s',
-          'box-shadow 0.36s',
+          `opacity 0.9s cubic-bezier(0.32,0.72,0,1) ${0.08 * index}s`,
+          `translate 0.9s cubic-bezier(0.32,0.72,0,1) ${0.08 * index}s`,
+          `filter 0.9s cubic-bezier(0.32,0.72,0,1) ${0.08 * index}s`,
+          'transform 0.7s cubic-bezier(0.32,0.72,0,1)',
+          'border-color 0.4s cubic-bezier(0.32,0.72,0,1)',
+          'box-shadow 0.5s cubic-bezier(0.32,0.72,0,1)',
         ].join(', ') }),
       }}
     >
       {/* specular surface glow layer */}
       <div ref={glowRef} style={{
         position: 'absolute', inset: 0, zIndex: 10,
-        pointerEvents: 'none', borderRadius: '14px',
+        pointerEvents: 'none', borderRadius: '22px',
         transition: 'background 0.1s',
       }} />
 
       {/* image */}
       <div style={{
         position: 'relative', aspectRatio: '16/9',
-        overflow: 'hidden',
+        overflow: 'hidden', borderRadius: 16,
         transform: 'translateZ(0)', backfaceVisibility: 'hidden',
         background: '#0b0e18',
       }}>
@@ -421,51 +427,46 @@ function ProjectCard({ project: p, index, visible }) {
       </div>
 
       {/* info */}
-      <div style={{ padding: '18px 20px 22px', position: 'relative', zIndex: 1 }}>
+      <div style={{ padding: '18px 16px 16px', position: 'relative', zIndex: 1 }}>
         <div style={{
           display: 'flex', alignItems: 'flex-start',
-          justifyContent: 'space-between', gap: '12px', marginBottom: '12px',
+          justifyContent: 'space-between', gap: '12px', marginBottom: '16px',
         }}>
           <div>
             <h3 style={{
               fontFamily: SANS, fontWeight: 600,
-              fontSize: '17px', lineHeight: 1.2, letterSpacing: '-0.01em',
+              fontSize: '18px', lineHeight: 1.2, letterSpacing: '-0.01em',
               color: '#fff',
               margin: '0 0 4px', transition: 'color 0.22s',
             }}>
               {p.title}
             </h3>
             <p style={{
-              fontFamily: SANS, fontWeight: 400, fontSize: '12px',
-              color: 'rgba(255,255,255,0.65)', margin: 0, letterSpacing: '0.02em',
+              fontFamily: SANS, fontWeight: 400, fontSize: '14px', lineHeight: 1.5,
+              color: 'rgba(255,255,255,0.58)', margin: 0,
             }}>
               {p.subtitle}
             </p>
           </div>
           <span style={{
-            fontFamily: SANS, fontWeight: 400, fontSize: '11px',
-            color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em',
+            fontFamily: SANS, fontWeight: 400, fontSize: '13px',
+            color: 'rgba(255,255,255,0.45)', fontVariantNumeric: 'tabular-nums',
             flexShrink: 0, paddingTop: '2px',
           }}>
             {p.year}
           </span>
         </div>
 
-        <div style={{
-          height: '1px', marginBottom: '12px',
-          background: `rgba(255,255,255,${hovered ? 0.09 : 0.05})`,
-          transition: 'background 0.28s',
-        }} />
-
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {p.tags.map(t => (
             <span key={t} style={{
-              fontFamily: SANS, fontWeight: 400, fontSize: '10px',
-              letterSpacing: '0.05em',
+              fontFamily: SANS, fontWeight: 400, fontSize: '12px',
+              letterSpacing: '0.01em',
               color: hovered ? '#fff' : 'rgba(255,255,255,0.6)',
-              border: `1px solid ${hovered ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.22)'}`,
-              borderRadius: '100px', padding: '3px 11px', whiteSpace: 'nowrap',
-              transition: 'color 0.22s, border-color 0.22s',
+              background: hovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${hovered ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.08)'}`,
+              borderRadius: '100px', padding: '4px 12px', whiteSpace: 'nowrap',
+              transition: 'color 0.4s cubic-bezier(0.32,0.72,0,1), border-color 0.4s cubic-bezier(0.32,0.72,0,1), background 0.4s cubic-bezier(0.32,0.72,0,1)',
             }}>
               {t}
             </span>

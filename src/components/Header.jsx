@@ -4,7 +4,7 @@ import { CASE_ORDER } from './CaseKit'
 import logo from '../assets/images/logo.svg'
 import avatar from '../assets/images/avatar-contact.png'
 
-const SANS = 'Inter, sans-serif'
+const SANS = '"Manrope", "Inter", sans-serif'
 const EMAIL = 'c4han@uw.edu'
 
 function IconMail() {
@@ -164,9 +164,9 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
   return (
     <header style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '28px 52px', width: '100%', position: 'relative', zIndex: 10,
+      padding: '28px clamp(20px, 4vw, 52px)', width: '100%', position: 'relative', zIndex: 10,
     }}>
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', height: 'clamp(18px, 5vw, 28px)' }}>
         {logoColor ? (
           <span role="img" aria-label="FINNICK" style={{ display: 'block', height: '100%', aspectRatio: '672 / 83', background: logoColor, WebkitMask: `url("${logo}") center / contain no-repeat`, mask: `url("${logo}") center / contain no-repeat` }} />
         ) : (

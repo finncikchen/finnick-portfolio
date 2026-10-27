@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 // Private traffic dashboard. Reads /api/stats with the admin key; opening it also opts this
 // browser out of tracking so your own visits don't skew the numbers.
-const SANS = 'Inter, sans-serif'
+const SANS = '"Manrope", "Inter", sans-serif'
 const C = { bg: '#f6f7f9', card: '#fff', ink: '#14161b', sub: '#6b7180', line: '#e7e9ee', accent: '#3b6cf6', good: '#16a34a', warn: '#d97706', info: '#3b6cf6' }
 const fmt = s => (s == null ? '–' : s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`)
 
