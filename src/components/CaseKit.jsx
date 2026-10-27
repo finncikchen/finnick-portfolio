@@ -148,12 +148,12 @@ export function Stats({ items }) {
 
 export function ContactCTA() {
   return (
-    <section style={{ ...W, paddingBottom: 'clamp(96px, 10vw, 140px)', textAlign: 'center' }}>
+    <section style={{ ...W, paddingBottom: 'clamp(112px, 12vw, 168px)', textAlign: 'center' }}>
       <p style={EYEBROW}>More to the story</p>
-      <h2 style={{ fontFamily: F, fontWeight: 500, fontSize: 'clamp(30px, 4.4vw, 52px)', lineHeight: 1.12, letterSpacing: '-0.035em', color: INK, maxWidth: 820, margin: '0 auto 20px' }}>
+      <h2 style={{ fontFamily: F, fontWeight: 500, fontSize: 'clamp(28px, 3.2vw, 44px)', lineHeight: 1.12, letterSpacing: '-0.035em', color: INK, maxWidth: 820, margin: '0 auto 20px' }}>
         Curious about the design process?
       </h2>
-      <P large style={{ maxWidth: 560, margin: '0 auto 36px' }}>
+      <P style={{ maxWidth: 560, margin: '0 auto 36px', fontSize: 17, lineHeight: '27px' }}>
         I'd be happy to walk you through the details over a call. Reach out at
       </P>
       <a href="mailto:c4han@uw.edu"

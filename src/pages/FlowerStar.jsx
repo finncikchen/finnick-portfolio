@@ -275,10 +275,10 @@ export default function FlowerStar() {
       </section>
 
       {/* CTA */}
-      <section style={{ ...W, padding: 'clamp(96px, 12vw, 160px) 48px clamp(96px, 10vw, 140px)', textAlign: 'center' }}>
+      <section style={{ ...W, paddingTop: 'clamp(112px, 12vw, 168px)', paddingBottom: 'clamp(112px, 12vw, 168px)', textAlign: 'center' }}>
         <p style={label}>More to the story</p>
-        <h2 style={{ ...statement, fontSize: 'clamp(30px, 4.4vw, 52px)', margin: '0 auto 20px' }}>Want to hear how the levels came together?</h2>
-        <p style={{ ...body, fontSize: 18, maxWidth: 520, margin: '0 auto 36px' }}>I'd be happy to walk you through it over a call. Reach out at</p>
+        <h2 style={{ ...statement, fontSize: 'clamp(28px, 3.2vw, 44px)', margin: '0 auto 20px' }}>Want to hear how the levels came together?</h2>
+        <p style={{ ...body, fontSize: 17, lineHeight: '27px', maxWidth: 560, margin: '0 auto 36px' }}>I'd be happy to walk you through it over a call. Reach out at</p>
         <a href="mailto:c4han@uw.edu" style={{ fontFamily: F, fontSize: 15, fontWeight: 500, color: SEA, background: TEXT, textDecoration: 'none', display: 'inline-flex', padding: '14px 24px', borderRadius: 999 }}>c4han@uw.edu ↗</a>
       </section>
 

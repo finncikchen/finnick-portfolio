@@ -1,10 +1,10 @@
-export const F     = 'Inter, sans-serif'
+export const F     = '"Manrope", "Inter", sans-serif'
 export const INK   = '#1d1d1f'
 export const SUB   = '#6e6e73'
 export const LIGHT = '#f2f2f2'
 export const FADE  = '#a9adb6'
-export const W     = { maxWidth: 1100, margin: '0 auto', padding: '0 48px' }
-export const WIDE  = { maxWidth: 1280, margin: '0 auto', padding: '0 32px' }
+export const W     = { maxWidth: 960, margin: '0 auto', padding: '0 clamp(24px, 12vw, 240px)', boxSizing: 'content-box' }
+export const WIDE  = { maxWidth: 1080, margin: '0 auto', padding: '0 clamp(24px, 12vw, 240px)', boxSizing: 'content-box' }
 export const GAP   = 'clamp(120px, 14vw, 200px)'
 export const STATEMENT = { fontFamily: F, fontWeight: 500, fontSize: 'clamp(28px, 3.4vw, 44px)', lineHeight: 1.16, letterSpacing: '-0.035em', color: INK, margin: 0 }
 export const EYEBROW = { fontFamily: F, fontSize: 13, fontWeight: 400, color: SUB, letterSpacing: '0.02em', textTransform: 'uppercase', margin: '0 0 22px' }

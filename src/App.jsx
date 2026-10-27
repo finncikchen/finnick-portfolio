@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigationType } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -8,6 +8,10 @@ import Bosch from './pages/Bosch'
 import Yhlo from './pages/Yhlo'
 import FlowerStar from './pages/FlowerStar'
 import Locked from './pages/Locked'
+import Admin from './pages/Admin'
+import { initAnalytics, trackPageview } from './lib/analytics'
+
+initAnalytics()
 
 // New pages open at the top; back/forward keeps the browser's position.
 function ScrollToTop() {
@@ -16,6 +20,7 @@ function ScrollToTop() {
   useLayoutEffect(() => {
     if (nav !== 'POP') window.scrollTo(0, 0)
   }, [pathname, nav])
+  useEffect(() => { if (pathname !== '/admin') trackPageview(pathname) }, [pathname])
   return null
 }
 
@@ -25,6 +30,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/about" element={<About />} />
         <Route path="/work/cisco" element={<Cisco />} />
         <Route path="/work/bytedance" element={<ByteDance />} />
