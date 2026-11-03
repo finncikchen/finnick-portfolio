@@ -269,11 +269,6 @@ export default function FlowerStar() {
         </div>
       </section>
 
-      {/* Closing */}
-      <section style={{ ...WIDE, paddingTop: 'clamp(120px, 14vw, 200px)', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 6vw, 84px)', lineHeight: 1.05, textShadow: '0 0 40px rgba(140,210,255,0.35)' }}>Love is not kept.<br /><span style={{ color: DIM }}>It is shared.</span></p>
-      </section>
-
       {/* CTA */}
       <section style={{ ...W, paddingTop: 'clamp(112px, 12vw, 168px)', paddingBottom: 'clamp(112px, 12vw, 168px)', textAlign: 'center' }}>
         <p style={label}>More to the story</p>
