@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import curtainImg from '../assets/images/home-bg.png'
+import curtainImg from '../assets/images/home-bg.webp'
 
 export default function CurtainIntro({ onComplete }) {
   const [phase, setPhase] = useState('closed')

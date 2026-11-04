@@ -166,7 +166,7 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '28px clamp(20px, 4vw, 52px)', width: '100%', position: 'relative', zIndex: 10,
     }}>
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', height: 'clamp(18px, 5vw, 28px)' }}>
+      <Link to="/" className="site-logo" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
         {logoColor ? (
           <span role="img" aria-label="FINNICK" style={{ display: 'block', height: '100%', aspectRatio: '672 / 83', background: logoColor, WebkitMask: `url("${logo}") center / contain no-repeat`, mask: `url("${logo}") center / contain no-repeat` }} />
         ) : (
@@ -174,11 +174,10 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
         )}
       </Link>
 
-      <nav style={{
-        display: 'flex', gap: '36px', alignItems: 'center',
+      <nav className={minimal ? 'site-nav site-nav--minimal' : 'site-nav'} style={{
+        display: 'flex', alignItems: 'center',
         fontFamily: SANS, fontSize: '13px', fontWeight: 400, letterSpacing: '0.04em',
         color: darkLogo ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
-        paddingRight: minimal ? 0 : 190,
       }}>
         {!minimal && [{ label: 'Work', to: '/' }, { label: 'About', to: '/about' }].map(item => (
           <Link key={item.label} to={item.to}
@@ -192,10 +191,10 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
 
         {/* Contact me */}
         <div ref={dropRef} style={{ position: 'fixed', top: 22, right: 'clamp(16px, 4vw, 52px)', zIndex: 100, borderRadius: 999, padding: 3, ...GLASS }}>
-          <button onClick={() => setOpen(v => !v)} style={{
+          <button className="contact-button" aria-label="Contact me" aria-expanded={open} onClick={() => setOpen(v => !v)} style={{
             display: 'flex', alignItems: 'center', gap: 8,
             background: open ? 'rgba(255,255,255,0.12)' : 'transparent', border: 0,
-            borderRadius: 100, padding: '4px 14px 4px 4px',
+            borderRadius: 100,
             cursor: 'pointer', color: 'rgba(255,255,255,0.9)',
             fontFamily: SANS, fontSize: '13px', fontWeight: 400,
             transition: 'background 0.2s',
@@ -204,7 +203,7 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
             onMouseLeave={e => { if (!open) e.currentTarget.style.background = 'transparent' }}
           >
             <img src={avatar} alt="Finnick" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
-            Contact me
+            <span className="contact-label">Contact me</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"
               style={{ transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
               <polyline points="6 9 12 15 18 9"/>

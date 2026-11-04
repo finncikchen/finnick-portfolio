@@ -368,11 +368,11 @@ export default function ByteDance() {
                 { img: imgMia, name: 'Mia', role: 'ByteDance Workspace', quote: 'I want critical data without digging through menus.', pains: ['Robot status is hard to check', 'Faults are hard to locate across floors', 'Permissions are messy'] },
               ].map(p => (
                 <div key={p.name} style={{ background: '#f2f2f2', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ position: 'relative', height: 300, backgroundImage: 'radial-gradient(rgba(0,0,0,0.07) 1px, transparent 1px)', backgroundSize: '10px 10px', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', paddingRight: '12%' }}>
+                  <div className="persona-stage" style={{ position: 'relative', height: 300, backgroundImage: 'radial-gradient(rgba(0,0,0,0.07) 1px, transparent 1px)', backgroundSize: '10px 10px', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
                     <img src={p.img} alt={p.name} style={{ height: '88%', objectFit: 'contain', marginBottom: 20 }} />
                     <div style={{ position: 'absolute', left: 20, top: 20 }}>
                       <p style={{ fontFamily: F, fontSize: 26, fontWeight: 500, letterSpacing: '-0.02em', color: INK, margin: 0 }}>{p.name}</p>
-                      <p style={{ fontFamily: F, fontSize: 13, color: SUB, textTransform: 'uppercase', letterSpacing: '0.02em', margin: '4px 0 0' }}>{p.role}</p>
+                      <p className="persona-role" style={{ fontFamily: F, fontSize: 13, color: SUB, textTransform: 'uppercase', letterSpacing: '0.02em', margin: '4px 0 0' }}>{p.role}</p>
                     </div>
                   </div>
                   <div style={{ background: '#fff', margin: 8, borderRadius: 12, padding: '24px 22px 22px', flex: 1, display: 'flex', flexDirection: 'column' }}>

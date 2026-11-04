@@ -113,7 +113,7 @@ export default function FlowerStar() {
 
       {/* Hero */}
       <div style={{ padding: 12 }}>
-        <div style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', aspectRatio: '2160 / 1268', background: `url(${cover}) center / cover no-repeat` }}>
+        <div className="fs-hero" style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', background: `url(${cover}) center / cover no-repeat` }}>
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(14,23,46,0.5) 0%, rgba(14,23,46,0) 22%)` }} />
           <div style={{ position: 'absolute', inset: 0, opacity: 0.35, mixBlendMode: 'soft-light', backgroundImage: GRAIN }} />
           <Bubbles />
@@ -267,11 +267,6 @@ export default function FlowerStar() {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Closing */}
-      <section style={{ ...WIDE, paddingTop: 'clamp(120px, 14vw, 200px)', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 6vw, 84px)', lineHeight: 1.05, textShadow: '0 0 40px rgba(140,210,255,0.35)' }}>Love is not kept.<br /><span style={{ color: DIM }}>It is shared.</span></p>
       </section>
 
       {/* CTA */}
