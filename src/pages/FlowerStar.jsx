@@ -113,7 +113,7 @@ export default function FlowerStar() {
 
       {/* Hero */}
       <div style={{ padding: 12 }}>
-        <div style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', aspectRatio: '2160 / 1268', background: `url(${cover}) center / cover no-repeat` }}>
+        <div className="fs-hero" style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', background: `url(${cover}) center / cover no-repeat` }}>
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(14,23,46,0.5) 0%, rgba(14,23,46,0) 22%)` }} />
           <div style={{ position: 'absolute', inset: 0, opacity: 0.35, mixBlendMode: 'soft-light', backgroundImage: GRAIN }} />
           <Bubbles />
@@ -269,16 +269,11 @@ export default function FlowerStar() {
         </div>
       </section>
 
-      {/* Closing */}
-      <section style={{ ...WIDE, paddingTop: 'clamp(120px, 14vw, 200px)', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 6vw, 84px)', lineHeight: 1.05, textShadow: '0 0 40px rgba(140,210,255,0.35)' }}>Love is not kept.<br /><span style={{ color: DIM }}>It is shared.</span></p>
-      </section>
-
       {/* CTA */}
-      <section style={{ ...W, padding: 'clamp(96px, 12vw, 160px) 48px clamp(96px, 10vw, 140px)', textAlign: 'center' }}>
+      <section style={{ ...W, paddingTop: 'clamp(112px, 12vw, 168px)', paddingBottom: 'clamp(112px, 12vw, 168px)', textAlign: 'center' }}>
         <p style={label}>More to the story</p>
-        <h2 style={{ ...statement, fontSize: 'clamp(30px, 4.4vw, 52px)', margin: '0 auto 20px' }}>Want to hear how the levels came together?</h2>
-        <p style={{ ...body, fontSize: 18, maxWidth: 520, margin: '0 auto 36px' }}>I'd be happy to walk you through it over a call. Reach out at</p>
+        <h2 style={{ ...statement, fontSize: 'clamp(28px, 3.2vw, 44px)', margin: '0 auto 20px' }}>Want to hear how the levels came together?</h2>
+        <p style={{ ...body, fontSize: 17, lineHeight: '27px', maxWidth: 560, margin: '0 auto 36px' }}>I'd be happy to walk you through it over a call. Reach out at</p>
         <a href="mailto:c4han@uw.edu" style={{ fontFamily: F, fontSize: 15, fontWeight: 500, color: SEA, background: TEXT, textDecoration: 'none', display: 'inline-flex', padding: '14px 24px', borderRadius: 999 }}>c4han@uw.edu ↗</a>
       </section>
 

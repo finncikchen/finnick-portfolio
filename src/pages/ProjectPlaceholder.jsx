@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import homeBg from '../assets/images/home-bg.png'
+import homeBg from '../assets/images/home-bg.webp'
 
 const projectMeta = {
   bytedance: { title: 'ByteDance', subtitle: 'Internal Platform · Operational Tools' },

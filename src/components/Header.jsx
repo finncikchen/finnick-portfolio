@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { CASE_ORDER } from './CaseKit'
 import logo from '../assets/images/logo.svg'
-import avatar from '../assets/images/profile.png'
+import avatar from '../assets/images/avatar-contact.png'
 
-const SANS = 'Inter, sans-serif'
+const SANS = '"Manrope", "Inter", sans-serif'
 const EMAIL = 'c4han@uw.edu'
 
 function IconMail() {
@@ -111,6 +112,43 @@ function LinkRow({ icon, label, sub, href, onClose }) {
   )
 }
 
+// Frosted-glass surface shared by the floating pills (All Work, Contact me).
+const GLASS = {
+  background: 'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)), rgba(28,28,32,0.42)',
+  border: '1px solid rgba(255,255,255,0.16)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 8px 24px rgba(0,0,0,0.14)',
+  backdropFilter: 'blur(18px) saturate(170%)', WebkitBackdropFilter: 'blur(18px) saturate(170%)',
+}
+
+// Floating "All Work" pill on case studies, shown once the page header has scrolled away.
+function CaseNav() {
+  const { pathname } = useLocation()
+  const i = CASE_ORDER.findIndex(([to]) => to === pathname)
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setShown(window.scrollY > 240)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [pathname])
+  if (i < 0) return null
+  const item = { display: 'flex', alignItems: 'center', gap: 6, padding: '7.25px 16px 7.25px 14px', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontFamily: SANS, fontSize: 13, borderRadius: 100, transition: 'background 0.2s', whiteSpace: 'nowrap' }
+  const on = e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)' }, off = e => { e.currentTarget.style.background = 'transparent' }
+  return (
+    <nav aria-label="Case study navigation" style={{
+      position: 'fixed', top: 22, left: 'clamp(16px, 4vw, 52px)', zIndex: 100, display: 'flex', alignItems: 'center', padding: 3,
+      borderRadius: 999, ...GLASS,
+      opacity: shown ? 1 : 0, transform: shown ? 'none' : 'translateY(-8px)', pointerEvents: shown ? 'auto' : 'none',
+      transition: 'opacity 0.25s ease, transform 0.25s ease',
+    }}>
+      <Link to="/" aria-label="All work" style={item} onMouseEnter={on} onMouseLeave={off} tabIndex={shown ? 0 : -1}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        All Work
+      </Link>
+    </nav>
+  )
+}
+
 export default function Header({ minimal = false, darkLogo = false, logoColor }) {
   const [open, setOpen] = useState(false)
   const dropRef = useRef(null)
@@ -126,9 +164,9 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
   return (
     <header style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '28px 52px', width: '100%', position: 'relative', zIndex: 10,
+      padding: '28px clamp(20px, 4vw, 52px)', width: '100%', position: 'relative', zIndex: 10,
     }}>
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
+      <Link to="/" className="site-logo" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
         {logoColor ? (
           <span role="img" aria-label="FINNICK" style={{ display: 'block', height: '100%', aspectRatio: '672 / 83', background: logoColor, WebkitMask: `url("${logo}") center / contain no-repeat`, mask: `url("${logo}") center / contain no-repeat` }} />
         ) : (
@@ -136,11 +174,10 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
         )}
       </Link>
 
-      <nav style={{
-        display: 'flex', gap: '36px', alignItems: 'center',
+      <nav className={minimal ? 'site-nav site-nav--minimal' : 'site-nav'} style={{
+        display: 'flex', alignItems: 'center',
         fontFamily: SANS, fontSize: '13px', fontWeight: 400, letterSpacing: '0.04em',
         color: darkLogo ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
-        paddingRight: minimal ? 0 : 190,
       }}>
         {!minimal && [{ label: 'Work', to: '/' }, { label: 'About', to: '/about' }].map(item => (
           <Link key={item.label} to={item.to}
@@ -150,22 +187,23 @@ export default function Header({ minimal = false, darkLogo = false, logoColor })
           >{item.label}</Link>
         ))}
 
+        <CaseNav />
+
         {/* Contact me */}
-        <div ref={dropRef} style={{ position: 'fixed', top: 22, right: 52, zIndex: 100, borderRadius: 999, background: 'rgba(22,22,24,0.72)', boxShadow: '0 6px 20px rgba(0,0,0,0.18)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
-          <button onClick={() => setOpen(v => !v)} style={{
+        <div ref={dropRef} style={{ position: 'fixed', top: 22, right: 'clamp(16px, 4vw, 52px)', zIndex: 100, borderRadius: 999, padding: 3, ...GLASS }}>
+          <button className="contact-button" aria-label="Contact me" aria-expanded={open} onClick={() => setOpen(v => !v)} style={{
             display: 'flex', alignItems: 'center', gap: 8,
-            background: open ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.08)',
-            border: `1px solid ${open ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.12)'}`,
-            borderRadius: 100, padding: '6px 14px 6px 6px',
-            cursor: 'pointer', color: 'rgba(255,255,255,0.85)',
+            background: open ? 'rgba(255,255,255,0.12)' : 'transparent', border: 0,
+            borderRadius: 100,
+            cursor: 'pointer', color: 'rgba(255,255,255,0.9)',
             fontFamily: SANS, fontSize: '13px', fontWeight: 400,
-            transition: 'background 0.2s, border-color 0.2s',
+            transition: 'background 0.2s',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.13)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)' }}
-            onMouseLeave={e => { if (!open) { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' } }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)' }}
+            onMouseLeave={e => { if (!open) e.currentTarget.style.background = 'transparent' }}
           >
-            <img src={avatar} alt="Finnick" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top' }} />
-            Contact me
+            <img src={avatar} alt="Finnick" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+            <span className="contact-label">Contact me</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"
               style={{ transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
               <polyline points="6 9 12 15 18 9"/>
