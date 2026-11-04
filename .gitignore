@@ -28,3 +28,6 @@ dist-ssr
 figma-exports/
 .vercel
 .secrets/
+
+# Local design-hook session cache
+.impeccable/hook.cache.json
