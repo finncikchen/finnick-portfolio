@@ -9,6 +9,8 @@ export default function useSnapToEnd() {
   const ref = useRef(null)
 
   useEffect(() => {
+    // on touch screens momentum pauses look like rest, and the page would be pulled away mid-read
+    if (window.matchMedia('(pointer: coarse)').matches) return
     let last = window.scrollY, down = false, timer = 0
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
 

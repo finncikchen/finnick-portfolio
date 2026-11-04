@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import fallback from '../assets/images/studio-reference.webp'
 import { MODEL_URL } from '../three/modelUrl'
 
 // Homepage opening in real 3D: a room lit by its pendant lamp.
@@ -39,21 +38,21 @@ function drawWindow(g, w, h) {
 const ROOM_FADE = 'radial-gradient(ellipse 50% 50% at 50% 50%,#000 62%,transparent 100%)'
 // the canvas is this much larger than the room it shows, so the oval fades out before it reaches the canvas edge
 const BLEED = 1.24
+const RETRIES = 2
 
 export default function Studio3D() {
   const box = useRef(null), ref = useRef(null)
-  const [failed, setFailed] = useState(false)
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    let dead = false, cleanup = () => {}
+    let dead = false, cleanup = () => {}, retry = 0
     Promise.all([import('three'), import('../three/createFinnickModel'), import('three/addons/loaders/GLTFLoader.js'), import('../three/figure')]).then(async ([THREE, { createProps, createRoom }, { GLTFLoader }, { rigFigure, SEATED }]) => {
       const gltf = await new GLTFLoader().loadAsync(MODEL_URL)
       if (dead) return
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const canvas = ref.current, wrap = box.current
-      let renderer
-      try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }) } catch { setFailed(true); return }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
       renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap
       const scene = new THREE.Scene()
       const { model, bones, lids, smileLine, fingers, point } = rigFigure(gltf)
@@ -291,16 +290,20 @@ export default function Studio3D() {
       cleanup = () => {
         window.removeEventListener('pointermove', onPointer); window.removeEventListener('click', onClick); delete document.body.dataset.sceneHot; gsap.ticker.remove(tick); ctx.revert(); ro.disconnect(); io.disconnect(); clearInterval(clock)
         scene.traverse((o) => { o.geometry?.dispose(); o.material?.map?.dispose(); o.material?.dispose?.() })
-        renderer.dispose()
+        renderer.dispose(); renderer.forceContextLoss()
       }
-    }).catch(() => setFailed(true))
-    return () => { dead = true; cleanup() }
-  }, [])
+    }).catch((err) => {
+      // a dropped download or a busy GPU is usually gone a moment later, so try again on a fresh canvas
+      console.error(err)
+      if (!dead && attempt < RETRIES) retry = setTimeout(() => setAttempt((n) => n + 1), 1200)
+    })
+    return () => { dead = true; clearTimeout(retry); cleanup() }
+  }, [attempt])
 
   return (
     <div ref={box} className="home-hero studio-scene" role="img" aria-label="Finnick working at a laptop and sipping coffee at night while it rains over Seattle"
       style={{ position: 'absolute', left: '50%', top: `calc(clamp(84px, 11vh, 110px) - min(96vw, 84vh) * ${(BLEED - 1) / 3})`, width: `calc(min(96vw, 84vh) * ${BLEED})`, aspectRatio: '3 / 2', transform: 'translateX(-50%)', pointerEvents: 'none', WebkitMaskImage: ROOM_FADE, maskImage: ROOM_FADE }}>
-      {failed ? <img src={fallback} alt="" style={{ width: '100%', display: 'block' }} /> : <canvas ref={ref} style={{ display: 'block', width: '100%', height: '100%' }} />}
+      <canvas key={attempt} ref={ref} style={{ display: 'block', width: '100%', height: '100%' }} />
     </div>
   )
 }

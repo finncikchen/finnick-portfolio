@@ -18,10 +18,10 @@ export default function PhotoBooth3D({ photos }) {
     Promise.all([import('three'), import('../three/createBooth'), import('three/addons/loaders/GLTFLoader.js'), import('../three/figure')]).then(([THREE, { createBooth, BUTTON_AT, STRIP_H, CURTAIN_OPEN, SEAT }, { GLTFLoader }, { rigFigure, SEATED }]) => {
       if (dead) return
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      const canvas = ref.current, wrap = box.current, press = pressRef.current, flash = flashRef.current
+      const canvas = ref.current, wrap = box.current, outer = stage.current, press = pressRef.current, flash = flashRef.current
       let renderer
       try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }) } catch { setFailed(true); return }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
       renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap
       renderer.localClippingEnabled = true
       const scene = new THREE.Scene()
@@ -93,7 +93,8 @@ export default function PhotoBooth3D({ photos }) {
         posed.setFromEuler(turn.set(-0.04 + gaze.y + Math.sin(t * 0.7) * 0.012 * live, gaze.x + Math.sin(t * 0.43) * 0.02 * live, -w * 0.07))
         bones.Head.node.quaternion.copy(posed.multiply(bones.Head.restWorld).premultiply(bones.Head.parentRest.clone().invert()))
       }
-      new GLTFLoader().loadAsync(MODEL_URL).then((gltf) => {
+      const loadModel = (tries) => new GLTFLoader().loadAsync(MODEL_URL).catch((err) => { if (tries) return loadModel(tries - 1); throw err })
+      loadModel(2).then((gltf) => {
         if (dead) return
         figure = rigFigure(gltf)
         const hips = gltf.scene.getObjectByName('mixamorigHips') ?? gltf.scene.getObjectByName('mixamorig:Hips')
@@ -169,7 +170,7 @@ export default function PhotoBooth3D({ photos }) {
       // the real button is a transparent one sitting over the 3D button, so it keeps focus and keyboard use
       const placePress = () => {
         probe.set(...BUTTON_AT).project(camera)
-        const rect = wrap.getBoundingClientRect(), out = stage.current.getBoundingClientRect()
+        const rect = wrap.getBoundingClientRect(), out = outer.getBoundingClientRect()
         press.style.transform = `translate(${rect.left - out.left + (probe.x + 1) / 2 * rect.width}px, ${rect.top - out.top + (1 - probe.y) / 2 * rect.height}px) translate(-50%, -50%)`
       }
       const draw = () => {
@@ -216,7 +217,7 @@ export default function PhotoBooth3D({ photos }) {
         gsap.ticker.remove(tick); run?.kill(); waving?.kill(); blinks?.kill(); gsap.killTweensOf(lit); ro.disconnect(); io.disconnect()
         press.onclick = press.onpointerenter = press.onpointerleave = null
         scene.traverse((o) => { o.geometry?.dispose(); o.material?.map?.dispose(); o.material?.dispose?.() })
-        renderer.dispose()
+        renderer.dispose(); renderer.forceContextLoss()
       }
     }).catch(() => setFailed(true))
     return () => { dead = true; cleanup() }

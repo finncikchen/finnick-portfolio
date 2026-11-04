@@ -40,6 +40,7 @@ export function rigFigure(gltf) {
     o.frustumCulled = false; o.castShadow = true
     Object.assign(o.material, { metalness: 0, metalnessMap: null, roughness: 0.82, roughnessMap: null })
     o.material.color.setScalar(0.72)
+    o.material.map.anisotropy = 8
   })
   const fingers = model.getObjectByProperty('isSkinnedMesh', true)
   const dir = new THREE.Vector3(), q = new THREE.Quaternion(), q2 = new THREE.Quaternion()

@@ -113,7 +113,7 @@ export default function FlowerStar() {
 
       {/* Hero */}
       <div style={{ padding: 12 }}>
-        <div style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', aspectRatio: '2160 / 1268', background: `url(${cover}) center / cover no-repeat` }}>
+        <div className="fs-hero" style={{ position: 'relative', borderRadius: 28, overflow: 'hidden', background: `url(${cover}) center / cover no-repeat` }}>
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(14,23,46,0.5) 0%, rgba(14,23,46,0) 22%)` }} />
           <div style={{ position: 'absolute', inset: 0, opacity: 0.35, mixBlendMode: 'soft-light', backgroundImage: GRAIN }} />
           <Bubbles />
