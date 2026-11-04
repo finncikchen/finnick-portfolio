@@ -53,7 +53,7 @@ function BoschCover({ hovered }) {
       <div style={{ ...fill, transform: `scale(${hovered ? 1.03 : 1})`, transition: `transform 0.7s ${SPRING}` }}>
         <video src="/bosch-flow.mp4" autoPlay muted loop playsInline preload="metadata"
           style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', background: '#fff', transformOrigin: '0 0', transform: matrix }} />
-        <img src="/laptop-gen.png" alt="" style={media} />
+        <img src="/laptop-gen.webp" alt="" style={media} />
       </div>
     </div>
   )
@@ -82,7 +82,7 @@ function ColorDiaryCover({ hovered }) {
     <div ref={ref} style={{ ...fill, overflow: 'hidden', background: '#1d1c1e' }}>
       <div style={{ ...fill, transform: `scale(${hovered ? 1.03 : 1})`, transition: `transform 0.7s ${SPRING}` }}>
         <img src={cdUI} alt="" style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', objectFit: 'cover', transformOrigin: '0 0', transform: matrix }} />
-        <img src="/tablet-gen.png" alt="" style={media} />
+        <img src="/tablet-gen.webp" alt="" style={media} />
       </div>
       <div aria-hidden style={{ ...fill, background: 'rgba(60,40,20,0.06)', mixBlendMode: 'lighten', pointerEvents: 'none' }} />
       <div aria-hidden style={{ ...fill, opacity: 0.28, mixBlendMode: 'overlay', pointerEvents: 'none', backgroundImage: grain(180, 1.1) }} />
@@ -90,7 +90,19 @@ function ColorDiaryCover({ hovered }) {
   )
 }
 
-export default function Cover({ id, hovered }) {
+// A cover's videos and images only start downloading as its card nears the viewport, so they never compete with the 3D scene on the first screen.
+export default function Cover(props) {
+  const ref = useRef(null)
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect() } }, { rootMargin: '300px 0px' })
+    io.observe(ref.current)
+    return () => io.disconnect()
+  }, [])
+  return <div ref={ref} style={fill}>{near && <CoverMedia {...props} />}</div>
+}
+
+function CoverMedia({ id, hovered }) {
   if (id === 'cisco') return <CiscoCover hovered={hovered} />
   if (id === 'bosch') return <BoschCover hovered={hovered} />
   if (id === 'bytedance') return <ByteDanceCover hovered={hovered} />

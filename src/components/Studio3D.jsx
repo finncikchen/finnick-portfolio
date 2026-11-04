@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import fallback from '../assets/images/studio-reference.webp'
+import { MODEL_URL } from '../three/modelUrl'
 
 // Homepage opening in real 3D: a room lit by its pendant lamp.
 // Finnick works, stops for a sip of coffee, and it rains at the real Seattle hour.
@@ -15,7 +16,7 @@ const HOLD = { g: [-0.25, 0, 0.97], u: [0, 1, 0] }, SIP = { g: [0.05, 0.47, 0.88
 const POSES = {
   reach: { RightArm: [-0.6, -0.6, 0.55], RightForeArm: [-0.55, -0.25, 0.8], RightHand: [-0.55, -0.25, 0.8] },
   lift: { RightArm: [-0.12, -0.42, 0.9], RightForeArm: [0.62, 0.78, 0.12], RightHand: [0.7, 0.65, 0.25] },
-  wave: { RightArm: [-0.5, -0.45, 0.6], RightForeArm: [-0.08, 1, 0.12] },
+  wave: { RightArm: [-0.8, -0.2, 0.45], RightForeArm: [-0.22, 1, 0.14] },
 }
 
 function drawWindow(g, w, h) {
@@ -46,7 +47,7 @@ export default function Studio3D() {
   useEffect(() => {
     let dead = false, cleanup = () => {}
     Promise.all([import('three'), import('../three/createFinnickModel'), import('three/addons/loaders/GLTFLoader.js'), import('../three/figure')]).then(async ([THREE, { createProps, createRoom }, { GLTFLoader }, { rigFigure, SEATED }]) => {
-      const gltf = await new GLTFLoader().loadAsync('/models/finnick.glb')
+      const gltf = await new GLTFLoader().loadAsync(MODEL_URL)
       if (dead) return
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const canvas = ref.current, wrap = box.current
@@ -90,6 +91,8 @@ export default function Studio3D() {
       // cold window light along his far side, and the screen's glow on his face
       const rim = new THREE.DirectionalLight('#7f9bff', 0.7); rim.position.set(8, 3, 2); scene.add(rim)
       const screen = new THREE.PointLight('#d5e0ff', 2.2, 5, 1.4); screen.position.set(0, 1.5, 0.75); scene.add(screen)
+      // the arm leaves the screen's glow when it lifts: this keeps its skin matching his face, and its short reach stops short of the wall
+      const armGlow = new THREE.PointLight('#ffe2c8', 0, 2.2, 1); scene.add(armGlow)
 
       let visible = true, lastExit = 0
       const P = { blink: 0, wave: 0, wag: 0, reach: 0, lift: 0, carry: 0, tilt: 0, look: 0, steam: 1 }
@@ -205,6 +208,8 @@ export default function Studio3D() {
           solved.u = u.lerp(V([1, 0, 0]), P.wave).normalize()
         }
         applyArm(solved)
+        bones.RightForeArm.node.getWorldPosition(armGlow.position); armGlow.position.z += 1.2; armGlow.position.y += 0.25
+        armGlow.intensity = 1.5 * Math.min(1, P.wave * 2.5)
         const smile = gsap.parseEase('sine.inOut')(Math.min(1, P.wave * 1.6))
         fingers.morphTargetInfluences[1] = 0.8 * smile; smileLine.material.opacity = smile; smileLine.visible = smile > 0.01
         fingers.morphTargetInfluences[0] = Math.min(1, Math.max(0, (P.reach - 0.55) / 0.4)) * 0.82 * (1 - P.wave)

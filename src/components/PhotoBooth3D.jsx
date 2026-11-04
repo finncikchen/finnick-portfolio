@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
+import { MODEL_URL } from '../three/modelUrl'
 
 // The photo booth in real 3D, lit like the homepage room: press the button, count down, flash, and a strip prints.
 const CENTER = [-0.85, 3.85], VIEW_HEIGHT = 8.5
@@ -92,7 +93,7 @@ export default function PhotoBooth3D({ photos }) {
         posed.setFromEuler(turn.set(-0.04 + gaze.y + Math.sin(t * 0.7) * 0.012 * live, gaze.x + Math.sin(t * 0.43) * 0.02 * live, -w * 0.07))
         bones.Head.node.quaternion.copy(posed.multiply(bones.Head.restWorld).premultiply(bones.Head.parentRest.clone().invert()))
       }
-      new GLTFLoader().loadAsync('/models/finnick.glb').then((gltf) => {
+      new GLTFLoader().loadAsync(MODEL_URL).then((gltf) => {
         if (dead) return
         figure = rigFigure(gltf)
         const hips = gltf.scene.getObjectByName('mixamorigHips') ?? gltf.scene.getObjectByName('mixamorig:Hips')

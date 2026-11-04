@@ -10,7 +10,7 @@ import CurtainIntro from '../components/CurtainIntro'
 import AsciiField from '../components/AsciiField'
 import Studio3D from '../components/Studio3D'
 import SiteFooter from '../components/SiteFooter'
-import homeBg from '../assets/images/home-bg.png'
+import homeBg from '../assets/images/home-bg.webp'
 
 import thumbBytedance  from '../assets/images/thumb-bytedance.webp'
 import thumbBosch      from '../assets/images/thumb-bosch.png'
@@ -22,7 +22,6 @@ import thumbColorDiary from '../assets/images/thumb-colordiary.webp'
 
 gsap.registerPlugin(useGSAP, Flip, ScrollTrigger, SplitText)
 
-const SERIF   = '"Cormorant Garamond", serif'
 const DISPLAY = '"Manrope", "Inter", sans-serif'
 const SANS    = '"Manrope", "Inter", sans-serif'
 const EASE_OUT = 'cubic-bezier(0.23,1,0.32,1)'
