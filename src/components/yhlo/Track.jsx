@@ -10,9 +10,13 @@ const T = ({ children, s = 14, c = BODY, w = 400, style }) => <span style={{ fon
 const abs = (x, y, w, h, extra) => ({ position: 'absolute', left: x, top: y, width: w, height: h, ...extra })
 const KF = '@keyframes trIn{from{opacity:0;transform:translateY(6px)}}@keyframes trPop{from{opacity:0;transform:scale(.95)}}@keyframes trDot{from{transform:scale(.2);opacity:0}}'
 
-function useTick(ms, n) {
+function useTick(ms, n, paused) {
   const [i, setI] = useState(0)
-  useEffect(() => { const id = setInterval(() => setI(x => (x + 1) % n), ms); return () => clearInterval(id) }, [ms, n])
+  useEffect(() => {
+    if (paused) { setI(0); return }
+    const id = setInterval(() => setI(x => (x + 1) % n), ms)
+    return () => clearInterval(id)
+  }, [ms, n, paused])
   return i
 }
 const Ico = ({ d, c = BODY, s = 22, sw = 1.7 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
@@ -98,8 +102,8 @@ function ListCard({ x, title, rows, empty, hi }) {
   )
 }
 
-export function TrackHome({ empty, popover }) {
-  const t = useTick(380, 40)
+export function TrackHome({ empty, popover, paused }) {
+  const t = useTick(380, 40, paused)
   const loaded = empty ? 0 : Math.min(4, Math.floor(t / 4) + 1)
   return (
     <TrackFrame running={!empty} badge={empty ? 0 : 5}>

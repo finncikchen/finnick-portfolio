@@ -1,11 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { ScaledWarehouse } from './LiveWarehouse'
 import YhloCover from './YhloCover'
+import ScreenLoop from './bosch/ScreenLoop'
 import fsLoop from '../assets/images/flowerstar/thumb-loop.mp4'
 import fsPoster from '../assets/images/flowerstar/thumb-poster.jpg'
 import cdUI from '../assets/images/colordiary-ui.webp'
 
+const InsightCover = lazy(() => import('./cisco/InsightCover'))
+
 const SPRING = 'cubic-bezier(0.32,0.72,0,1)'
+// The View project cursor lands first, then the cover starts moving
+const MOTION_DELAY = 280
 const fill = { position: 'absolute', inset: 0 }
 const media = { ...fill, width: '100%', height: '100%', objectFit: 'cover' }
 const grain = (size, freq) => `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`
@@ -27,49 +32,97 @@ function useHomography([a, b, c, d, e, f, g, h]) {
   return [ref, matrix]
 }
 
-function CiscoCover({ hovered }) {
-  const [ending, setEnding] = useState(false)
+function CiscoCover() {
   return (
-    <div style={{ ...fill, overflow: 'hidden', background: ending ? '#020309' : '#f2f3f5', transition: 'background 0.6s' }}>
-      <video src="/cisco-ui/insight-to-action.mp4" autoPlay muted loop playsInline preload="metadata"
-        onTimeUpdate={e => { const v = e.currentTarget; setEnding(v.duration && v.currentTime > v.duration - 2.2) }}
-        style={{ ...media, transform: `scale(${hovered ? 1.27 : 1.23})`, opacity: ending ? 0 : 1, transition: `transform 0.7s ${SPRING}, opacity 0.4s ease` }} />
-      <div style={{
-        position: 'absolute', inset: -2, display: 'grid', placeItems: 'center', opacity: ending ? 1 : 0, transition: `opacity 0.6s ${SPRING}`,
-        background: 'radial-gradient(ellipse 90% 70% at 38% 118%, rgba(14,140,230,0.85) 0%, rgba(20,90,200,0.45) 38%, rgba(10,30,90,0) 72%), radial-gradient(ellipse 70% 60% at 80% 120%, rgba(150,60,180,0.6) 0%, rgba(90,50,170,0.3) 40%, rgba(20,20,60,0) 75%), radial-gradient(ellipse 120% 80% at 50% 110%, rgba(25,55,150,0.55) 0%, rgba(8,14,40,0) 70%), linear-gradient(180deg, #020309 0%, #040817 50%, #0a1638 100%)',
-      }}>
-        <div aria-hidden style={{ ...fill, opacity: 0.22, mixBlendMode: 'overlay', backgroundImage: grain(160, 0.9) }} />
-        <img src="/cisco-ui/cisco-logo.png" alt="Cisco" style={{ position: 'relative', height: '18%', width: 'auto', transform: ending ? 'none' : 'scale(0.92)', transition: `transform 0.8s ${SPRING}` }} />
-      </div>
+    <div style={{ ...fill, overflow: 'hidden', background: '#1c2a44 url(/cisco-ui/cover-bg.webp) center / cover no-repeat' }}>
+      <Suspense fallback={null}><InsightCover hoverDelay={MOTION_DELAY} /></Suspense>
     </div>
   )
 }
 
-const LAPTOP = [0.354324, -0.04734, 0.380859, -0.036233, 0.487587, 0.141204, -0.110833, -0.031596]
-function BoschCover({ hovered }) {
+// Covers rest on their first frame until their card is hovered and go back to it when the pointer
+// leaves; with no hover (a phone) they play while in view.
+// Two videos composited at once hold the whole page near 30fps, so each cover paints its frames
+// to a canvas and the video stays hidden. Browsers without frame callbacks just show the video.
+function CoverVideo({ live, src, poster, startAt = 0, style }) {
+  const videoRef = useRef(null)
+  const canvasRef = useRef(null)
+  useEffect(() => {
+    if (window.matchMedia('(hover: none)').matches) return
+    const video = videoRef.current
+    if (live) video.play().catch(() => {})
+    else {
+      video.pause()
+      if (video.currentTime !== startAt) video.currentTime = startAt
+    }
+  }, [live, startAt])
+  useEffect(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    const io = new IntersectionObserver(([entry]) => {
+      if (!window.matchMedia('(hover: none)').matches) return
+      if (entry.isIntersecting) video.play().catch(() => {})
+      else video.pause()
+    })
+    io.observe(video)
+    if (!video.requestVideoFrameCallback) return () => io.disconnect()
+    let frame
+    const draw = () => {
+      if (canvas.width !== video.videoWidth) {
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+      }
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
+      video.style.visibility = 'hidden'
+    }
+    const paint = () => {
+      draw()
+      frame = video.requestVideoFrameCallback(paint)
+    }
+    frame = video.requestVideoFrameCallback(paint)
+    video.addEventListener('seeked', draw)
+    return () => {
+      io.disconnect()
+      video.cancelVideoFrameCallback(frame)
+      video.removeEventListener('seeked', draw)
+    }
+  }, [])
+  return (
+    <>
+      <video ref={videoRef} src={src} muted loop={!startAt} playsInline preload="auto" style={style}
+        onEnded={e => { e.target.currentTime = startAt; e.target.play().catch(() => {}) }} />
+      <canvas ref={canvasRef} aria-hidden style={style} />
+      {poster && <img src={poster} alt="" style={{ ...style, opacity: live || window.matchMedia('(hover: none)').matches ? 0 : 1, transition: `opacity 0.25s ease, ${style.transition}` }} />}
+    </>
+  )
+}
+
+// The screen fills the laptop's display edge to edge and runs just under the bezel, so no gap can show.
+const LAPTOP = [0.790339, 0.021387, 0.125262, 0.098424, 0.781149, 0.035502, 0.202506, -0.026526]
+function BoschCover({ live }) {
   const [ref, matrix] = useHomography(LAPTOP)
   return (
-    <div ref={ref} style={{ ...fill, overflow: 'hidden', background: '#5f87a8' }}>
-      <div style={{ ...fill, transform: `scale(${hovered ? 1.03 : 1})`, transition: `transform 0.7s ${SPRING}` }}>
-        <video src="/bosch-flow.mp4" autoPlay muted loop playsInline preload="metadata"
-          style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', background: '#fff', transformOrigin: '0 0', transform: matrix }} />
-        <img src="/laptop-gen.webp" alt="" style={media} />
+    <div ref={ref} style={{ ...fill, overflow: 'hidden', background: '#000' }}>
+      <div style={fill}>
+        {/* Chrome rasters a perspective layer at its layout size, so the screen is laid out at twice the cover and halved */}
+        <div style={{ position: 'absolute', left: 0, top: 0, width: '200%', height: '200%', transformOrigin: '0 0', transform: `${matrix} scale(0.5)` }}><ScreenLoop live={live} /></div>
+        <img src="/bosch-laptop.webp" alt="" style={media} />
       </div>
     </div>
   )
 }
 
-function ByteDanceCover({ hovered }) {
+function ByteDanceCover({ hovered, live }) {
   return (
     <div style={{ ...fill, background: '#1a1d22' }}>
-      <video src="/bytedance-warehouse.mp4" autoPlay muted loop playsInline preload="metadata" style={media} />
+      <CoverVideo live={live} src="/bytedance-warehouse.mp4" style={media} />
       <div aria-hidden style={{ ...fill, background: 'linear-gradient(180deg, rgba(10,12,18,0.15), rgba(10,12,18,0.35))' }} />
       <div style={{
-        position: 'absolute', left: '50%', top: '50%', width: '72%', aspectRatio: '1267 / 618', overflow: 'hidden', background: '#fff', borderRadius: 4,
+        position: 'absolute', left: '50%', top: '50%', width: '66%', aspectRatio: '1040 / 650', overflow: 'hidden', background: '#fff', borderRadius: 4,
         boxShadow: '0 2px 6px rgba(0,0,0,0.18), 0 24px 60px rgba(0,0,0,0.45)',
         transition: 'transform 0.5s ease', transform: hovered ? 'translate(-50%, -50%) scale(1.03)' : 'translate(-50%, -50%)',
       }}>
-        <ScaledWarehouse />
+        <ScaledWarehouse tall paused={!live} />
       </div>
     </div>
   )
@@ -103,13 +156,20 @@ export default function Cover(props) {
 }
 
 function CoverMedia({ id, hovered }) {
-  if (id === 'cisco') return <CiscoCover hovered={hovered} />
-  if (id === 'bosch') return <BoschCover hovered={hovered} />
-  if (id === 'bytedance') return <ByteDanceCover hovered={hovered} />
-  if (id === 'yhlo') return <YhloCover hovered={hovered} />
+  const [live, setLive] = useState(false)
+  useEffect(() => {
+    if (!hovered) { setLive(false); return }
+    const timer = setTimeout(() => setLive(true), MOTION_DELAY)
+    return () => clearTimeout(timer)
+  }, [hovered])
+  if (id === 'cisco') return <CiscoCover />
+  if (id === 'bosch') return <BoschCover live={live} />
+  if (id === 'bytedance') return <ByteDanceCover hovered={hovered} live={live} />
+  if (id === 'yhlo') return <YhloCover hovered={hovered} live={live} />
   if (id === 'color-diary') return <ColorDiaryCover hovered={hovered} />
   if (id === 'flower-star') return (
-    <video src={fsLoop} poster={fsPoster} autoPlay muted loop playsInline
+    // The clip fades up from black, so it starts just past that, on the frame the poster shows
+    <CoverVideo live={live} src={fsLoop} poster={fsPoster} startAt={0.4}
       style={{ ...media, transition: 'transform 0.6s ease', transform: hovered ? 'scale(1.04)' : 'none' }} />
   )
   return null
