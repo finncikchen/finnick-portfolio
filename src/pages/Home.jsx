@@ -49,7 +49,7 @@ const PROJECTS = [
   {
     id: 'yhlo', title: 'YHLO · Lab Automation System',
     subtitle: 'Making complex lab automation safer and easier to operate.',
-    tags: ['Healthcare UX', 'Medical Devices'], year: '2024',
+    tags: ['Healthcare UX', 'HMI'], year: '2024',
     category: 'products', thumb: thumbYhlo, cover: true, objectPos: 'center center',
   },
   {
@@ -325,16 +325,7 @@ export default function Home() {
 function ProjectCard({ project: p }) {
   const cardRef  = useRef(null)
   const glowRef  = useRef(null)
-  const tilt     = useRef(null)
   const [hovered, setHovered] = useState(false)
-
-  useGSAP(() => {
-    gsap.set(cardRef.current, { transformPerspective: 1200 })
-    tilt.current = {
-      x: gsap.quickTo(cardRef.current, 'rotationX', { duration: 0.5, ease: 'power3.out' }),
-      y: gsap.quickTo(cardRef.current, 'rotationY', { duration: 0.5, ease: 'power3.out' }),
-    }
-  }, { scope: cardRef })
 
   const handleMouseMove = useCallback((e) => {
     const card = cardRef.current
@@ -342,12 +333,6 @@ function ProjectCard({ project: p }) {
     const rect = card.getBoundingClientRect()
     const x = e.clientX - rect.left   // 0 → rect.width
     const y = e.clientY - rect.top    // 0 → rect.height
-    const cx = rect.width  / 2
-    const cy = rect.height / 2
-    // tilt: max ±3deg — subtle
-    const rotateX = ((y - cy) / cy) * -3
-    const rotateY = ((x - cx) / cx) *  3
-    tilt.current?.x(rotateX); tilt.current?.y(rotateY)
     // specular glow follows cursor
     if (glowRef.current) {
       glowRef.current.style.background =
@@ -357,7 +342,6 @@ function ProjectCard({ project: p }) {
 
   const handleMouseLeave = useCallback(() => {
     setHovered(false)
-    tilt.current?.x(0); tilt.current?.y(0)
     if (glowRef.current)
       glowRef.current.style.background = 'transparent'
   }, [])
@@ -437,18 +421,6 @@ function ProjectCard({ project: p }) {
                 {/* grain */}
                 <div style={{ position: 'absolute', inset: 0, opacity: 0.22, mixBlendMode: 'overlay', backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")` }} />
               </>
-            )}
-            {p.id === 'cisco' && (
-              <div style={{
-                position: 'absolute', left: '50%', top: '10%', width: '86%', aspectRatio: '1536/1024',
-                transform: `translateX(-50%) ${hovered ? 'translateY(-4px) scale(1.02)' : ''}`,
-                transition: `transform 0.25s ${EASE_OUT}`,
-              }}>
-                <video src="/cisco-hero.mov" autoPlay loop muted playsInline
-                  style={{ position: 'absolute', top: '8.1%', left: '8.72%', width: '82.49%', height: '60.35%', objectFit: 'fill' }} />
-                <img src="/cisco-ui/monitor-frame-17.png" alt=""
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
-              </div>
             )}
           </>
         ) : (
@@ -581,6 +553,7 @@ function FilterTabs({ filter, onChange }) {
 function SpotlightCursor() {
   const ref = useRef(null)
   const dotRef = useRef(null)
+  const labelRef = useRef(null)
   useGSAP((_, contextSafe) => {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
     const xTo = gsap.quickTo(ref.current, 'x', { duration: 0.14, ease: 'power3.out' })
@@ -589,10 +562,13 @@ function SpotlightCursor() {
     const move = contextSafe(e => {
       if (first) { first = false; gsap.set(ref.current, { x: e.clientX, y: e.clientY, opacity: 1 }) }
       xTo(e.clientX); yTo(e.clientY)
-      const state = e.target.closest?.('a:not(.home-card), button') || document.body.dataset.sceneHot ? 'link' : null
+      const state = e.target.closest?.('a:not(.home-card), button') || document.body.dataset.sceneHot ? 'link' : e.target.closest?.('.home-card') ? 'project' : null
       if (state === over) return
       over = state
-      gsap.to(dotRef.current, { scale: state === 'link' ? 3 : 1, duration: 0.25, ease: 'power3.out', overwrite: 'auto' })
+      gsap.to(dotRef.current, { scale: state === 'link' ? 3 : state === 'project' ? 0 : 1, duration: 0.25, ease: 'power3.out', overwrite: 'auto' })
+      gsap.to(labelRef.current, state === 'project'
+        ? { scale: 1, opacity: 1, duration: 0.32, ease: 'back.out(1.6)', overwrite: 'auto' }
+        : { scale: 0.6, opacity: 0, duration: 0.16, ease: 'power2.out', overwrite: 'auto' })
     })
     window.addEventListener('mousemove', move, { passive: true })
     return () => window.removeEventListener('mousemove', move)
@@ -603,6 +579,13 @@ function SpotlightCursor() {
         position: 'absolute', left: -2.5, top: -2.5, width: 5, height: 5, borderRadius: '50%',
         background: 'rgba(255,255,255,0.9)',
       }} />
+      <div ref={labelRef} style={{
+        position: 'absolute', left: 0, top: 0, translate: '-50% -50%', opacity: 0, scale: 0.6, whiteSpace: 'nowrap',
+        padding: '9px 16px', borderRadius: 999, background: '#0a0c12', color: '#fff', boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+        fontFamily: SANS, fontSize: 13, fontWeight: 500, letterSpacing: '-0.005em',
+      }}>
+        View project
+      </div>
     </div>
   )
 }

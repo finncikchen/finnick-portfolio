@@ -31,6 +31,13 @@ const ROBOTS = [
   { id: '13-EVT1', net: 2, bat: 22, s: 'alarm', d: 'M840,40 V250 H430 V40 Z', dur: 30 },
 ]
 
+// The extra floor a standard-shaped screen has room for
+const TALL_SHELF_ROWS = [520, 590, 660]
+const TALL_ROBOTS = [
+  { id: '31-EVT1', net: 4, bat: 77, s: 'run', d: 'M60,555 H390 V625 H60 Z', dur: 21 },
+  { id: '34-EVT1', net: 3, bat: 41, s: 'chg', d: 'M840,555 H430 V695 H840 Z', dur: 25 },
+]
+
 // The Figma robot pin: soft halo, blurred ring, gradient disc, top-down robot, and a heading arrow on the rim.
 // Drawn facing +x; animateMotion rotate="auto" turns it along the route.
 function PinBody({ s, k }) {
@@ -52,17 +59,27 @@ function PinBody({ s, k }) {
   )
 }
 
-function WarehouseMap() {
+function WarehouseMap({ tall, paused }) {
+  const svgRef = useRef(null)
+  useEffect(() => {
+    if (paused) {
+      svgRef.current.pauseAnimations()
+      svgRef.current.setCurrentTime(0)
+    } else svgRef.current.unpauseAnimations()
+  }, [paused])
+  const floor = tall ? 760 : 520
+  const shelves = tall ? [...SHELF_ROWS, ...TALL_SHELF_ROWS] : SHELF_ROWS
+  const robots = tall ? [...ROBOTS, ...TALL_ROBOTS] : ROBOTS
   return (
-    <svg viewBox="0 0 900 520" style={{ width: '100%', height: '100%', display: 'block' }} preserveAspectRatio="xMidYMid slice">
+    <svg ref={svgRef} viewBox={`0 0 900 ${floor}`} style={{ width: '100%', height: '100%', display: 'block' }} preserveAspectRatio="xMidYMid slice">
       {/* floor: tinted slab with a light dot pattern and a hairline wall */}
       <defs>
         <pattern id="lw-dots" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#d4dcea" /></pattern>
       </defs>
-      <rect x="0" y="0" width="900" height="520" fill="#f1f4f9" />
-      <rect x="0" y="0" width="900" height="520" fill="url(#lw-dots)" />
+      <rect x="0" y="0" width="900" height={floor} fill="#f1f4f9" />
+      <rect x="0" y="0" width="900" height={floor} fill="url(#lw-dots)" />
       {/* racks: back-to-back shelving, each side a row of bays */}
-      {SHELF_ROWS.map(y => SHELF_COLS.map(([x0, x1]) => {
+      {shelves.map(y => SHELF_COLS.map(([x0, x1]) => {
         const n = Math.floor((x1 - x0 + 4) / 24)
         return (
           <g key={`${y}-${x0}`}>
@@ -75,7 +92,7 @@ function WarehouseMap() {
           </g>
         )
       }))}
-      {ROBOTS.map((r, k) => {
+      {robots.map((r, k) => {
         const motion = { dur: `${r.dur}s`, repeatCount: 'indefinite', path: r.d, begin: `-${k * 2.3}s` }
         return (
           <g key={r.id}>
@@ -134,8 +151,8 @@ const seg = (a, b) => (
   </span>
 )
 
-export default function LiveWarehouse() {
-  const rows = ROBOTS.slice(0, 5)
+export default function LiveWarehouse({ tall, paused }) {
+  const rows = ROBOTS.slice(0, tall ? 6 : 5)
   const [sel, setSel] = useState(() => new Set([rows[0].id, rows[2].id]))
   const all = sel.size === rows.length
   const toggle = id => setSel(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n })
@@ -156,7 +173,7 @@ export default function LiveWarehouse() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', gap: 10, padding: 10, fontFamily: UI, background: 'linear-gradient(160deg, #eef3fb 0%, #e6edf8 100%)', overflow: 'hidden' }}>
       {/* left column */}
-      <div style={{ flex: '0 0 30%', display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
+      <div style={{ flex: tall ? '0 0 360px' : '0 0 30%', display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
         <Card style={{ padding: '12px 14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 17, fontWeight: 600, color: '#1d2129' }}>Warehouse</span>
@@ -216,7 +233,7 @@ export default function LiveWarehouse() {
           <span style={{ marginLeft: 'auto', fontSize: 10, color: '#4e5969', border: '1px solid #e5e6eb', borderRadius: 4, padding: '2px 8px' }}>Location Inf ▴</span>
         </Card>
         <Card style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <WarehouseMap />
+          <WarehouseMap tall={tall} paused={paused} />
           <div style={{ position: 'absolute', right: 16, top: 16, width: 112, background: '#fff', borderRadius: 6, padding: '4px 0', boxShadow: '0 2px 10px rgba(20,40,90,0.12)', fontSize: 10, color: '#4e5969' }}>
             {['Picking Point', 'Packing Point', 'Waiting Point'].map((t, k) => (
               <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: k === 0 ? '#f2f3f5' : '#fff' }}>
@@ -234,19 +251,20 @@ export default function LiveWarehouse() {
   )
 }
 
-// Scales the fixed 1267 x 618 screen to fill whatever box it sits in
-export function ScaledWarehouse() {
+// Scales the fixed screen to fill whatever box it sits in. 1267 x 618 is the monitor mockup; tall is an ordinary 16:10 screen.
+export function ScaledWarehouse({ tall, paused }) {
+  const [width, height] = tall ? [1040, 650] : [1267, 618]
   const ref = useRef(null)
   const [k, setK] = useState(0.5)
   useEffect(() => {
-    const ro = new ResizeObserver(([e]) => setK(e.contentRect.width / 1267))
+    const ro = new ResizeObserver(([e]) => setK(e.contentRect.width / width))
     ro.observe(ref.current)
     return () => ro.disconnect()
-  }, [])
+  }, [width])
   return (
     <div ref={ref} style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', left: 0, top: 0, width: 1267, height: 618, transformOrigin: '0 0', transform: `scale(${k})` }}>
-        <LiveWarehouse />
+      <div style={{ position: 'absolute', left: 0, top: 0, width, height, transformOrigin: '0 0', transform: `scale(${k})` }}>
+        <LiveWarehouse tall={tall} paused={paused} />
       </div>
     </div>
   )

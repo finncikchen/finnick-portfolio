@@ -1,6 +1,8 @@
 import { FooterNav } from '../components/CaseKit'
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
+
+const ServersDemo = lazy(() => import('../components/cisco/ServersDemo'))
 
 const ACCENT = '#00bceb'
 const F     = '"Manrope", "Inter", sans-serif'
@@ -145,7 +147,7 @@ function Pipeline() {
           <div>&nbsp;&nbsp;"health": "Critical" {'}'}</div>
         </div>
       ) },
-    { n: '04', icon: 'spark', t: 'Shape the output', d: 'Gemini/Circuit writes the insight, and it lands in the card’s strict shape: a short title, two lines, one action.',
+    { n: '04', icon: 'spark', t: 'Shape the output', d: 'Circuit, Cisco’s own AI, writes the insight, and it lands in the card’s strict shape: a short title, two lines, one action.',
       v: (
         <video src="/cisco-ui/ai-generate.mov" autoPlay loop muted playsInline
           style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', borderRadius: 8 }} />
@@ -632,21 +634,21 @@ export default function Cisco() {
                 From a page title to{' '}
                 <span style={{ color: 'rgba(255,255,255,0.62)' }}>an adaptive, AI-powered operational solution</span>
               </h1>
-              <a href="https://www.figma.com/make/lY0KtrzfHANiVsrMk1ceOA/Header-design-prototype?fullscreen=1" target="_blank" rel="noreferrer"
+              <a href="https://www.cisco.com/site/us/en/products/computing/hybrid-cloud-operations/intersight-platform/index.html" target="_blank" rel="noreferrer"
                 style={{ fontFamily: F, fontSize: 14, fontWeight: 500, color: INK, background: '#ffffff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 20px', borderRadius: 999, transition: 'opacity 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
                 onMouseLeave={e => e.currentTarget.style.opacity = '1'}
               >
-                Explore prototype
+                Explore Intersight
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
               </a>
             </section>
             <div style={W}>
               {/* monitor body spans x=106..1429 of 1536px image; widen so body edges match text edges */}
               <div style={{ position: 'relative', width: '116.1%', marginLeft: '-8.01%', aspectRatio: '1536/900', overflow: 'hidden' }}>
-                <video src="/cisco-hero.mov" autoPlay loop muted playsInline
-                  style={{ position: 'absolute', top: '9.22%', left: '8.72%', width: '82.49%', height: '68.67%', objectFit: 'fill', display: 'block', zIndex: 0 }}
-                />
+                <div style={{ position: 'absolute', top: '9.22%', left: '8.72%', width: '82.49%', height: '68.67%', background: '#f6f6f7', overflow: 'hidden', zIndex: 0 }}>
+                  <Suspense fallback={null}><ServersDemo /></Suspense>
+                </div>
                 <img src="/cisco-ui/monitor-frame-17.png" alt="Monitor"
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '113.78%', zIndex: 1, pointerEvents: 'none' }}
                 />
