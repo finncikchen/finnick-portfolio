@@ -1,3 +1,7 @@
+import { useRef } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { SplitText } from 'gsap/SplitText'
 import Header from '../components/Header'
 import SiteFooter from '../components/SiteFooter'
 import PhotoBooth3D from '../components/PhotoBooth3D'
@@ -9,6 +13,8 @@ import booth3 from '../assets/images/about/booth3.webp'
 import iconPen from '../assets/images/about/icon-pen.png'
 import iconPin from '../assets/images/about/icon-pin.png'
 import iconNote from '../assets/images/about/icon-note.png'
+
+gsap.registerPlugin(useGSAP, SplitText)
 
 const INK = '#f2f4f8'
 const SUB = 'rgba(255,255,255,0.55)'
@@ -26,8 +32,58 @@ const BLOCKS = [
 ]
 
 export default function About() {
+  const pageRef = useRef(null)
+
+  // the greeting behaves like the home page headline: it assembles letter by letter,
+  // the letters lean toward the cursor, and hovering a word sends a ripple through it
+  useGSAP((_, contextSafe) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const title = pageRef.current.querySelector('.ab-hi')
+    let chars = []
+    SplitText.create(title, {
+      type: 'words, chars', charsClass: 'ab-hi-char', wordsClass: 'ab-hi-word', autoSplit: true,
+      onSplit: (self) => {
+        chars = self.chars.map(el => ({
+          el,
+          y: gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' }),
+          r: gsap.quickTo(el, 'rotation', { duration: 0.5, ease: 'power3.out' }),
+        }))
+        return gsap.from(self.chars, { autoAlpha: 0, yPercent: 60, duration: 0.7, ease: 'power3.out', stagger: 0.02, delay: 0.15 })
+      },
+    })
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
+
+    const REACH = 130
+    let resting = true
+    const onMove = contextSafe((e) => {
+      const box = title.getBoundingClientRect()
+      const near = e.clientY > box.top - REACH && e.clientY < box.bottom + REACH
+      if (!near) {
+        if (!resting) { chars.forEach(c => { c.y(0); c.r(0) }); resting = true }
+        return
+      }
+      resting = false
+      chars.forEach(({ el, y, r }) => {
+        const b = el.getBoundingClientRect()
+        const dx = e.clientX - b.left - b.width / 2
+        const dy = e.clientY - b.top - b.height / 2 + gsap.getProperty(el, 'y')
+        const pull = Math.max(0, 1 - Math.hypot(dx, dy) / REACH)
+        y(-12 * pull * pull)
+        r(gsap.utils.clamp(-7, 7, dx / 14) * pull)
+      })
+    })
+    const onOver = contextSafe((e) => {
+      const word = e.target.closest('.ab-hi-word')
+      if (!word || word.contains(e.relatedTarget)) return
+      gsap.fromTo(word.querySelectorAll('.ab-hi-char'), { yPercent: 0 }, { yPercent: -16, duration: 0.22, ease: 'power2.out', yoyo: true, repeat: 1, stagger: 0.022, overwrite: 'auto' })
+    })
+    window.addEventListener('mousemove', onMove, { passive: true })
+    title.addEventListener('mouseover', onOver)
+    return () => { window.removeEventListener('mousemove', onMove); title.removeEventListener('mouseover', onOver) }
+  }, { scope: pageRef })
+
   return (
-    <div style={{ position: 'relative', background: '#07090f', color: INK, fontFamily: F, minHeight: '100vh' }}>
+    <div ref={pageRef} style={{ position: 'relative', background: '#07090f', color: INK, fontFamily: F, minHeight: '100vh' }}>
       {/* same curtain backdrop and darkness as the home page */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', backgroundImage: `url(${homeBg})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.55, filter: 'brightness(1.3)' }} />
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', background: 'rgba(2,4,12,0.82)' }} />
@@ -51,12 +107,14 @@ export default function About() {
         .ab-block:hover .ab-i-note { transform: rotate(-12deg) translateY(-1.5px) }
         @media (prefers-reduced-motion: reduce) { .ab-label img { transition: none } }
         @media (min-width: 960px) { .ab-row { flex-direction: row; align-items: flex-start; gap: clamp(56px, 7vw, 110px) } }
-        /* the booth holds still, centred in the window, while the text scrolls past it;
+        /* the booth starts centred in the window and scrolls with the text;
            the greeting starts on the same line as the booth's sign so the two read as one */
         @media (min-width: 960px) {
           .ab-row { --H: calc(min(42vw, 74vh, 560px) * 7 / 6); --T: max(96px, calc(50vh - var(--H) / 2 + 28px)); max-width: 1320px !important; padding-top: 0 !important }
-          .ab-booth { position: sticky; top: var(--T); margin-top: calc(var(--T) - 84px) }
-          .ab-copy { padding-top: calc(var(--T) - 84px + var(--H) * 0.105) }
+          .ab-booth { margin-top: calc(var(--T) - 84px) }
+          .ab-copy { padding-top: calc(var(--T) - 84px + var(--H) * 0.101) }
+          /* pull the heading up by its own leading so the cap tops, not the line box, meet the sign's top edge */
+          .ab-hi { margin-top: -0.23em !important }
         }
       `}</style>
       <div className="ab-row" style={{ maxWidth: 1180, margin: '0 auto', padding: 'clamp(32px, 5vw, 64px) clamp(20px, 5vw, 48px) 0' }}>
@@ -65,7 +123,7 @@ export default function About() {
       </section>
 
       <section className="ab-copy" style={{ flex: '1 1 0', minWidth: 0, maxWidth: 620, paddingBottom: 'clamp(48px, 10vh, 120px)' }}>
-        <h1 style={{ fontFamily: F, fontWeight: 400, fontSize: 'clamp(28px, 3.4vw, 48px)', lineHeight: 1.16, letterSpacing: '-0.03em', color: '#edf0f7', margin: 0 }}>Hi, I'm Finnick.</h1>
+        <h1 className="ab-hi" style={{ fontFamily: F, fontWeight: 400, fontSize: 'clamp(28px, 3.4vw, 48px)', lineHeight: 1.16, letterSpacing: '-0.03em', color: '#edf0f7', margin: 0 }}>Hi, I'm Finnick.</h1>
         {BLOCKS.map(({ label, tags, text }, i) => (
           <div key={label} className="ab-block" style={{ marginTop: i === 0 ? 40 : 44 }}>
             <p className="ab-label" style={{ fontFamily: F, fontSize: 11.5, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', margin: '0 0 10px' }}><img className={`ab-i-${ICONS[label][0]}`} src={ICONS[label][1]} alt="" />{label}</p>
