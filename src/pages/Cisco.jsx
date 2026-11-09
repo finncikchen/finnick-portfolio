@@ -629,7 +629,7 @@ export default function Cisco() {
           <div style={{ position: 'relative' }}>
             <Header minimal />
             <section style={{ ...W, paddingTop: 'clamp(24px, 4vw, 56px)', paddingBottom: 48 }}>
-              <img src="/cisco-ui/cisco-logo.png" alt="Cisco" style={{ height: 30, display: 'block', marginBottom: 28 }} />
+              <img src="/cisco-ui/cisco-logo.svg" alt="Cisco" style={{ height: 30, display: 'block', marginBottom: 28 }} />
               <h1 style={{ fontFamily: F, fontWeight: 500, fontSize: 'clamp(34px, 4.8vw, 60px)', lineHeight: 1.06, letterSpacing: '-0.04em', color: '#ffffff', margin: '0 0 32px' }}>
                 From a page title to{' '}
                 <span style={{ color: 'rgba(255,255,255,0.62)' }}>an adaptive, AI-powered operational solution</span>

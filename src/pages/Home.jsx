@@ -146,7 +146,7 @@ export default function Home() {
   useGSAP((_, contextSafe) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     if (!visible) {
-      gsap.set('.home-card', { autoAlpha: 0, y: 72, clipPath: 'inset(16% 7% 0% 7% round 24px)' })
+      gsap.set('.home-card', { autoAlpha: 0, y: 72 })
       gsap.set('.home-hero', { autoAlpha: 0 })
       return
     }
@@ -204,7 +204,12 @@ export default function Home() {
     }
     ScrollTrigger.batch('.home-card', {
       start: 'top 92%', once: true,
-      onEnter: batch => gsap.to(batch, { autoAlpha: 1, y: 0, clipPath: 'inset(0% 0% 0% 0% round 24px)', clearProps: 'clipPath', duration: 1.15, ease: 'power3.out', stagger: 0.09, overwrite: 'auto' }),
+      onEnter: batch => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 1.15, ease: 'power3.out', stagger: 0.09, overwrite: 'auto' }),
+    })
+    // each project opens up to full width as it comes up the screen, and its title follows a beat behind
+    gsap.utils.toArray('.home-card').forEach(card => {
+      gsap.fromTo(card.querySelector('.home-media'), { scale: 0.86 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'top 28%', scrub: 0.6 } })
+      gsap.fromTo(card.querySelector('.home-info'), { y: 36, autoAlpha: 0 }, { y: 0, autoAlpha: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top 85%', end: 'top 35%', scrub: 0.6 } })
     })
     // screen one to two: the headline lifts away and the filters come up to meet the cards
     gsap.to('section.home-hero', { y: -120, ease: 'none', scrollTrigger: { trigger: stageRef.current, start: 'top top', end: 'bottom top', scrub: 0.5 } })
@@ -301,8 +306,8 @@ export default function Home() {
             </span>
           </div>
 
-          {/* 2 × 2 grid — fixed, no layout changes */}
-          <style>{'.home-title-co{color:rgba(237,240,247,0.86);border-bottom:1px solid rgba(237,240,247,0.25);transition:border-color 0.2s}.home-title-co:hover{border-color:rgba(237,240,247,0.8)}.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,2.4vw,32px)}@media(max-width:760px){.home-grid{grid-template-columns:1fr}}.home-card:active{scale:0.985}.home-card:focus-visible,.home-tab:focus-visible{outline:2px solid rgba(180,210,255,0.9);outline-offset:4px}.home-tab:active{scale:0.97}@media(prefers-reduced-motion:reduce){.home-card{transform:none!important;translate:none!important;filter:none!important;transition:opacity 0.2s ease!important}}'}</style>
+          {/* one project to a row, studio style */}
+          <style>{'.home-title-co{color:rgba(237,240,247,0.86);border-bottom:1px solid rgba(237,240,247,0.25);transition:border-color 0.2s}.home-title-co:hover{border-color:rgba(237,240,247,0.8)}.home-grid{display:grid;grid-template-columns:1fr;gap:clamp(64px,9vw,136px)}.home-card:active .home-media{scale:0.992}.home-card:focus-visible,.home-tab:focus-visible{outline:2px solid rgba(180,210,255,0.9);outline-offset:4px}.home-tab:active{scale:0.97}@media(prefers-reduced-motion:reduce){.home-card{transform:none!important;translate:none!important;filter:none!important;transition:opacity 0.2s ease!important}}'}</style>
           <div className="home-grid">
             {filtered.map(p => (
               <ProjectCard key={p.id} project={p} />
@@ -323,28 +328,7 @@ export default function Home() {
 /* ── Card ─────────────────────────────────────────────────── */
 
 function ProjectCard({ project: p }) {
-  const cardRef  = useRef(null)
-  const glowRef  = useRef(null)
   const [hovered, setHovered] = useState(false)
-
-  const handleMouseMove = useCallback((e) => {
-    const card = cardRef.current
-    if (!card) return
-    const rect = card.getBoundingClientRect()
-    const x = e.clientX - rect.left   // 0 → rect.width
-    const y = e.clientY - rect.top    // 0 → rect.height
-    // specular glow follows cursor
-    if (glowRef.current) {
-      glowRef.current.style.background =
-        `radial-gradient(280px circle at ${x}px ${y}px, rgba(255,255,255,0.07), transparent 70%)`
-    }
-  }, [])
-
-  const handleMouseLeave = useCallback(() => {
-    setHovered(false)
-    if (glowRef.current)
-      glowRef.current.style.background = 'transparent'
-  }, [])
 
   // bytedance has a full case study; everything else opens behind a password gate
   const href = `/work/${p.id}`
@@ -355,41 +339,18 @@ function ProjectCard({ project: p }) {
   return (
     <Wrapper
       {...wrapperProps}
-      ref={cardRef}
       className="home-card"
       data-project={p.id}
       onMouseEnter={() => setHovered(true)}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        display: 'block', textDecoration: 'none',
-        borderRadius: '22px', overflow: 'hidden', padding: 6,
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-        border: `1px solid ${hovered ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.06)'}`,
-        boxShadow: hovered
-          ? '0 30px 60px -20px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)'
-          : '0 10px 30px -18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
-        willChange: 'transform',
-        transition: [
-          `scale 160ms ${EASE_OUT}`,
-          `border-color 0.2s ${EASE_OUT}`,
-          `box-shadow 0.25s ${EASE_OUT}`,
-        ].join(', '),
-      }}
+      onMouseLeave={() => setHovered(false)}
+      style={{ display: 'block', textDecoration: 'none' }}
     >
-      {/* specular surface glow layer */}
-      <div ref={glowRef} style={{
-        position: 'absolute', inset: 0, zIndex: 10,
-        pointerEvents: 'none', borderRadius: '22px',
-        transition: 'background 0.1s',
-      }} />
-
       {/* image */}
-      <div style={{
+      <div className="home-media" style={{
         position: 'relative', aspectRatio: '16/9',
-        overflow: 'hidden', borderRadius: 16,
-        transform: 'translateZ(0)', backfaceVisibility: 'hidden',
-        background: '#0b0e18',
+        overflow: 'hidden', borderRadius: 10,
+        background: '#0b0e18', transformOrigin: '50% 0%', willChange: 'transform',
+        transition: `scale 160ms ${EASE_OUT}`,
       }}>
         {p.cover ? (
           <Cover id={p.id} hovered={hovered} />
@@ -399,111 +360,40 @@ function ProjectCard({ project: p }) {
             style={{
               width: '100%', height: '100%',
               objectFit: 'cover', objectPosition: p.objectPos, display: 'block',
-              filter: (p.id === 'bytedance' || p.id === 'bosch' || p.id === 'yhlo' || p.id === 'flower-star' || p.id === 'color-diary')
-                ? (hovered ? 'brightness(1.0)' : 'brightness(0.82)')
-                : (hovered ? 'brightness(0.55) blur(1.5px)' : 'brightness(0.45) blur(1.5px)'),
+              filter: hovered ? 'brightness(1.0)' : 'brightness(0.82)',
               transition: `filter 0.2s ${EASE_OUT}`,
             }}
           />
-        ) : p.gradient ? (
-          <>
-            <div style={{
-              width: '100%', height: '100%',
-              background: p.gradient,
-              opacity: hovered ? 1 : 0.9,
-              transition: `opacity 0.2s ${EASE_OUT}`,
-            }} />
-            {p.id === 'cisco' && (
-              <>
-                {/* glass arcs */}
-                <div style={{ position: 'absolute', width: '90%', aspectRatio: '1', left: '-35%', top: '-55%', borderRadius: '50%', border: '28px solid rgba(255,255,255,0.35)', filter: 'blur(6px)' }} />
-                <div style={{ position: 'absolute', width: '110%', aspectRatio: '1', right: '-60%', bottom: '-95%', borderRadius: '50%', border: '40px solid rgba(255,255,255,0.28)', boxShadow: 'inset 0 0 60px rgba(120,160,240,0.35)', filter: 'blur(4px)' }} />
-                {/* grain */}
-                <div style={{ position: 'absolute', inset: 0, opacity: 0.22, mixBlendMode: 'overlay', backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")` }} />
-              </>
-            )}
-          </>
-        ) : (
-          <div style={{
-            width: '100%', height: '100%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 14px)',
-          }}>
-            <span style={{
-              fontFamily: SANS, fontSize: '11px', letterSpacing: '0.22em',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)',
-            }}>
-              In Progress
-            </span>
-          </div>
-        )}
-        {p.id !== 'bytedance' && p.id !== 'cisco' && p.id !== 'bosch' && p.id !== 'yhlo' && p.id !== 'flower-star' && p.id !== 'color-diary' && (
-          <div style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px',
-            pointerEvents: 'none',
-          }}>
-            <div style={{
-              width: '40px', height: '40px', borderRadius: '50%',
-              background: 'rgba(8,11,22,0.55)', border: '1px solid rgba(255,255,255,0.25)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backdropFilter: 'blur(3px)',
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <rect x="5" y="11" width="14" height="10" rx="2" stroke="white" strokeOpacity="0.85" strokeWidth="1.6" />
-                <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="white" strokeOpacity="0.85" strokeWidth="1.6" strokeLinecap="round" />
-                <circle cx="12" cy="16" r="1.4" fill="white" fillOpacity="0.85" />
-              </svg>
-            </div>
-            <span style={{
-              fontFamily: SANS, fontSize: '10px', letterSpacing: '0.18em',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)',
-            }}>
-              Password Protected
-            </span>
-          </div>
-        )}
+        ) : null}
       </div>
 
       {/* info */}
-      <div style={{ padding: '18px 16px 16px', position: 'relative', zIndex: 1 }}>
-        <div style={{
-          display: 'flex', alignItems: 'flex-start',
-          justifyContent: 'space-between', gap: '12px', marginBottom: '16px',
+      <div className="home-info" style={{
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: '8px 24px', padding: '22px 2px 0',
+      }}>
+        <h3 style={{
+          fontFamily: SANS, fontWeight: 500,
+          fontSize: 'clamp(20px, 2vw, 26px)', lineHeight: 1.2, letterSpacing: '-0.015em',
+          color: hovered ? '#fff' : 'rgba(255,255,255,0.88)',
+          margin: 0, transition: `color 0.2s ${EASE_OUT}`,
         }}>
-          <div>
-            <h3 style={{
-              fontFamily: SANS, fontWeight: 600,
-              fontSize: '18px', lineHeight: 1.2, letterSpacing: '-0.01em',
-              color: '#fff',
-              margin: 0, transition: 'color 0.22s',
-            }}>
-              {p.title}
-            </h3>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {p.tags.map(t => (
-            <span key={t} style={{
-              fontFamily: SANS, fontWeight: 400, fontSize: '12px',
-              letterSpacing: '0.01em',
-              color: hovered ? '#fff' : 'rgba(255,255,255,0.6)',
-              background: hovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${hovered ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.08)'}`,
-              borderRadius: '100px', padding: '4px 12px', whiteSpace: 'nowrap',
-              transition: `color 0.2s ${EASE_OUT}, border-color 0.2s ${EASE_OUT}, background 0.2s ${EASE_OUT}`,
-            }}>
-              {t}
-            </span>
-          ))}
-        </div>
+          {p.title}
+        </h3>
+        <span style={{
+          fontFamily: SANS, fontWeight: 400, fontSize: '14px', letterSpacing: '0.01em',
+          color: hovered ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.46)',
+          transition: `color 0.2s ${EASE_OUT}`,
+        }}>
+          {p.tags.join('  ·  ')}
+        </span>
       </div>
     </Wrapper>
   )
 }
 
-/* ── Filter tabs with sliding pill ───────────────────────── */
+/* ── Filter tabs ──────────────────────────────────────────── */
+
 function FilterTabs({ filter, onChange }) {
   const refs   = useRef({})
   const barRef = useRef(null)
@@ -550,14 +440,19 @@ function FilterTabs({ filter, onChange }) {
 }
 
 /* ── Cursor ──────────────────────────────────────────────── */
+// The dot is drawn at the size it grows to and shrunk, so the grown circle stays crisp
+const RING = 54
+const DOT = 5 / RING
+
 function SpotlightCursor() {
   const ref = useRef(null)
   const dotRef = useRef(null)
-  const labelRef = useRef(null)
+  const arrowRef = useRef(null)
   useGSAP((_, contextSafe) => {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
-    const xTo = gsap.quickTo(ref.current, 'x', { duration: 0.14, ease: 'power3.out' })
-    const yTo = gsap.quickTo(ref.current, 'y', { duration: 0.14, ease: 'power3.out' })
+    const xTo = gsap.quickTo(ref.current, 'x', { duration: 0.18, ease: 'power3.out' })
+    const yTo = gsap.quickTo(ref.current, 'y', { duration: 0.18, ease: 'power3.out' })
+    gsap.set(dotRef.current, { scale: DOT })
     let first = true, over = null
     const move = contextSafe(e => {
       if (first) { first = false; gsap.set(ref.current, { x: e.clientX, y: e.clientY, opacity: 1 }) }
@@ -565,27 +460,30 @@ function SpotlightCursor() {
       const state = e.target.closest?.('a:not(.home-card), button') || document.body.dataset.sceneHot ? 'link' : e.target.closest?.('.home-card') ? 'project' : null
       if (state === over) return
       over = state
-      gsap.to(dotRef.current, { scale: state === 'link' ? 3 : state === 'project' ? 0 : 1, duration: 0.25, ease: 'power3.out', overwrite: 'auto' })
-      gsap.to(labelRef.current, state === 'project'
-        ? { scale: 1, opacity: 1, duration: 0.32, ease: 'back.out(1.6)', overwrite: 'auto' }
-        : { scale: 0.6, opacity: 0, duration: 0.16, ease: 'power2.out', overwrite: 'auto' })
+      // Over a project the dot swells into a circle that inverts what is under it, and an arrow is cut out of it
+      const big = state === 'project'
+      gsap.to(dotRef.current, {
+        scale: big ? 1 : state === 'link' ? DOT * 3 : DOT,
+        duration: big ? 0.55 : 0.35, ease: big ? 'expo.out' : 'power3.out', overwrite: 'auto',
+      })
+      gsap.to(arrowRef.current, big
+        ? { scale: 1, rotation: 0, opacity: 1, duration: 0.5, delay: 0.06, ease: 'expo.out', overwrite: 'auto' }
+        : { scale: 0.4, rotation: -45, opacity: 0, duration: 0.18, ease: 'power2.out', overwrite: 'auto' })
     })
     window.addEventListener('mousemove', move, { passive: true })
     return () => window.removeEventListener('mousemove', move)
   }, { scope: ref })
   return (
-    <div ref={ref} style={{ position: 'fixed', top: 0, left: 0, opacity: 0, pointerEvents: 'none', zIndex: 50, willChange: 'transform' }}>
+    // Difference blending turns the circle into the negative of the card beneath; the arrow, drawn black, leaves the card as it is
+    <div ref={ref} style={{ position: 'fixed', top: 0, left: 0, opacity: 0, pointerEvents: 'none', zIndex: 50, willChange: 'transform', mixBlendMode: 'difference' }}>
       <div ref={dotRef} style={{
-        position: 'absolute', left: -2.5, top: -2.5, width: 5, height: 5, borderRadius: '50%',
-        background: 'rgba(255,255,255,0.9)',
+        position: 'absolute', left: -RING / 2, top: -RING / 2, width: RING, height: RING, borderRadius: '50%', background: '#fff',
       }} />
-      <div ref={labelRef} style={{
-        position: 'absolute', left: 0, top: 0, translate: '-50% -50%', opacity: 0, scale: 0.6, whiteSpace: 'nowrap',
-        padding: '9px 16px', borderRadius: 999, background: '#0a0c12', color: '#fff', boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
-        fontFamily: SANS, fontSize: 13, fontWeight: 500, letterSpacing: '-0.005em',
+      <svg ref={arrowRef} width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden style={{
+        position: 'absolute', left: -9.5, top: -9.5, opacity: 0, transform: 'scale(0.4) rotate(-45deg)',
       }}>
-        View project
-      </div>
+        <path d="M7 17L17 7M8.5 7H17V15.5" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </div>
   )
 }

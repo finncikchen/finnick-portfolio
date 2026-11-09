@@ -80,7 +80,7 @@ function Toast({ on }) {
   )
 }
 
-// The still the card rests on until it is hovered: the logo on its background
+// The still the card rests on until it scrolls into view: the logo on its background
 const RESTING = { live: false, hand: false, scene: 'rest', face: 'load', toast: false }
 const REST = { x: 770, y: 440 }
 
@@ -105,9 +105,11 @@ async function script(a) {
   await a.wait(1400)
   a.mark('end')
   await a.set(RESTING)
+  // The logo holds a moment before the cards come in again
+  await a.wait(1600)
 }
 
-export default function InsightCover({ hoverDelay }) {
+export default function InsightCover() {
   return (
     <Stage
       width={720}
@@ -115,9 +117,8 @@ export default function InsightCover({ hoverDelay }) {
       fill
       unframed
       initial={RESTING}
-      play="hover"
-      hoverWithin="a.home-card"
-      hoverDelay={hoverDelay}
+      play="loop"
+      inViewAt={0.6}
       poster={{ ...RESTING, live: true, scene: 'ask', face: 'done', toast: true }}
       script={script}
       cursor={{ at: REST, style: 'large', ripple: true }}
