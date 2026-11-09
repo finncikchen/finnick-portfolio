@@ -21,7 +21,7 @@ export default function SiteFooter() {
   return (
     <footer ref={footerRef} style={{ position: 'relative', overflowX: 'clip' }}>
       <div style={{ maxWidth: '1120px', margin: '0 auto', padding: 'clamp(96px, 14vh, 160px) clamp(20px, 8vw, 160px) 0', boxSizing: 'content-box', width: 'calc(100% - 2 * clamp(20px, 8vw, 160px))' }}>
-        <p style={{ fontFamily: FONT, fontSize: 'clamp(26px, 3vw, 40px)', lineHeight: 1.2, color: 'rgba(237,240,247,0.6)', margin: 0 }}>
+        <p style={{ fontFamily: FONT, fontSize: 'clamp(26px, 3vw, 40px)', lineHeight: 1.2, color: 'rgba(237,240,247,0.6)', margin: 0, textAlign: 'center' }}>
           Systems thinking and visual craft, <span style={{ color: '#fff' }}>shaped in code.</span>
         </p>
       </div>
