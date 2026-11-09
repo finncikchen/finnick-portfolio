@@ -48,6 +48,8 @@ export interface StageProps<S> {
   hoverWithin?: string
   /** With play="hover": how long (ms) the pointer must stay before the script starts. */
   hoverDelay?: number
+  /** How much of the stage (0 to 1) must be in view before it starts. It stops only once fully out of view. */
+  inViewAt?: number
   /**
    * A second, smaller design for narrow containers. Below `below` px of
    * container width the stage uses this size, the render's `layout` argument
@@ -103,6 +105,7 @@ export function Stage<S extends object>({
   play: playProp = 'loop',
   hoverWithin,
   hoverDelay = 0,
+  inViewAt = 0,
   compact,
   keys: keysAt = 'bottom',
   palette = 'accent',
@@ -530,11 +533,13 @@ export function Stage<S extends object>({
     const markOffscreen = () => stage.toggleAttribute('data-offscreen', !onScreen || document.hidden)
     markOffscreen()
     const io = new IntersectionObserver(([entry]) => {
-      onScreen = entry.isIntersecting
+      // Starts once enough of it shows; scrolling partly away leaves it playing until it is gone
+      if (!entry.isIntersecting) onScreen = false
+      else if (entry.intersectionRatio >= inViewAt) onScreen = true
       // Off screen its CSS animations pause too, so nothing runs out of view
       markOffscreen()
       onScreen ? start() : stop()
-    })
+    }, { threshold: [0, inViewAt] })
     io.observe(root)
     // A missed "came into view" callback would leave the scene parked for good.
     // While it thinks it is off screen, re-observing asks for a fresh answer.
@@ -578,7 +583,7 @@ export function Stage<S extends object>({
       autoRef.current = null
       cancelReset()
     }
-  }, [still, script, makeAct, play, layout]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [still, script, makeAct, play, layout, inViewAt]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     if (cursor && !still && !dragging.current) autoRef.current?.(pos.current)

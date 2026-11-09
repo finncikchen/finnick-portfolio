@@ -9,8 +9,8 @@ import cdUI from '../assets/images/colordiary-ui.webp'
 const InsightCover = lazy(() => import('./cisco/InsightCover'))
 
 const SPRING = 'cubic-bezier(0.32,0.72,0,1)'
-// The View project cursor lands first, then the cover starts moving
-const MOTION_DELAY = 280
+// How much of a cover must be in view before it starts moving
+const IN_VIEW = 0.6
 const fill = { position: 'absolute', inset: 0 }
 const media = { ...fill, width: '100%', height: '100%', objectFit: 'cover' }
 const grain = (size, freq) => `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`
@@ -35,20 +35,19 @@ function useHomography([a, b, c, d, e, f, g, h]) {
 function CiscoCover() {
   return (
     <div style={{ ...fill, overflow: 'hidden', background: '#1c2a44 url(/cisco-ui/cover-bg.webp) center / cover no-repeat' }}>
-      <Suspense fallback={null}><InsightCover hoverDelay={MOTION_DELAY} /></Suspense>
+      <Suspense fallback={null}><InsightCover /></Suspense>
     </div>
   )
 }
 
-// Covers rest on their first frame until their card is hovered and go back to it when the pointer
-// leaves; with no hover (a phone) they play while in view.
+// Covers rest on their first frame until their card scrolls into view, and go back to it once it
+// has scrolled fully away.
 // Two videos composited at once hold the whole page near 30fps, so each cover paints its frames
 // to a canvas and the video stays hidden. Browsers without frame callbacks just show the video.
 function CoverVideo({ live, src, poster, startAt = 0, style }) {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
   useEffect(() => {
-    if (window.matchMedia('(hover: none)').matches) return
     const video = videoRef.current
     if (live) video.play().catch(() => {})
     else {
@@ -59,13 +58,7 @@ function CoverVideo({ live, src, poster, startAt = 0, style }) {
   useEffect(() => {
     const video = videoRef.current
     const canvas = canvasRef.current
-    const io = new IntersectionObserver(([entry]) => {
-      if (!window.matchMedia('(hover: none)').matches) return
-      if (entry.isIntersecting) video.play().catch(() => {})
-      else video.pause()
-    })
-    io.observe(video)
-    if (!video.requestVideoFrameCallback) return () => io.disconnect()
+    if (!video.requestVideoFrameCallback) return
     let frame
     const draw = () => {
       if (canvas.width !== video.videoWidth) {
@@ -82,7 +75,6 @@ function CoverVideo({ live, src, poster, startAt = 0, style }) {
     frame = video.requestVideoFrameCallback(paint)
     video.addEventListener('seeked', draw)
     return () => {
-      io.disconnect()
       video.cancelVideoFrameCallback(frame)
       video.removeEventListener('seeked', draw)
     }
@@ -92,22 +84,36 @@ function CoverVideo({ live, src, poster, startAt = 0, style }) {
       <video ref={videoRef} src={src} muted loop={!startAt} playsInline preload="auto" style={style}
         onEnded={e => { e.target.currentTime = startAt; e.target.play().catch(() => {}) }} />
       <canvas ref={canvasRef} aria-hidden style={style} />
-      {poster && <img src={poster} alt="" style={{ ...style, opacity: live || window.matchMedia('(hover: none)').matches ? 0 : 1, transition: `opacity 0.25s ease, ${style.transition}` }} />}
+      {poster && <img src={poster} alt="" style={{ ...style, opacity: live ? 0 : 1, transition: `opacity 0.25s ease, ${style.transition}` }} />}
     </>
   )
 }
 
-// The screen fills the laptop's display edge to edge and runs just under the bezel, so no gap can show.
-const LAPTOP = [0.790339, 0.021387, 0.125262, 0.098424, 0.781149, 0.035502, 0.202506, -0.026526]
+// The display's frame is one even bezel, and the screen's corners are the frame's minus that bezel, so the two curves share a centre
+const BEZEL = 1.1, RADIUS = 2.6
+// A bare display in a dark studio, turned away and run off the cover's left edge, the live screen on it. While the cover
+// plays, the camera eases round to face it.
 function BoschCover({ live }) {
-  const [ref, matrix] = useHomography(LAPTOP)
   return (
-    <div ref={ref} style={{ ...fill, overflow: 'hidden', background: '#000' }}>
-      <div style={fill}>
-        {/* Chrome rasters a perspective layer at its layout size, so the screen is laid out at twice the cover and halved */}
-        <div style={{ position: 'absolute', left: 0, top: 0, width: '200%', height: '200%', transformOrigin: '0 0', transform: `${matrix} scale(0.5)` }}><ScreenLoop live={live} /></div>
-        <img src="/bosch-laptop.webp" alt="" style={media} />
+    <div style={{ ...fill, overflow: 'hidden', background: 'radial-gradient(110% 95% at 88% 4%, #50535a 0%, #1d1e22 36%, #08080a 72%)' }}>
+      <div style={{ ...fill, perspective: 1600, perspectiveOrigin: '60% 40%', WebkitMaskImage: 'linear-gradient(180deg, #000 55%, transparent 97%)', maskImage: 'linear-gradient(180deg, #000 55%, transparent 97%)' }}>
+        <div style={{
+          position: 'absolute', left: '4%', top: '14%', width: '94%', aspectRatio: `100 / ${(100 - 2 * BEZEL) * 0.645 + 2 * BEZEL}`, transformOrigin: '100% 50%', containerType: 'inline-size',
+          transform: live ? 'rotateY(13deg) rotateX(5deg)' : 'rotateY(24deg) rotateX(9deg)',
+          transition: live ? 'transform 9s cubic-bezier(0.2, 0.6, 0.3, 1)' : 'transform 0.9s cubic-bezier(0.65, 0, 0.15, 1)',
+          borderRadius: `${RADIUS}% / ${RADIUS / ((100 - 2 * BEZEL) * 0.00645 + 2 * BEZEL / 100)}%`, background: 'linear-gradient(135deg, #2a2b30 0%, #0e0f11 38%, #050506 100%)',
+          boxShadow: '0 70px 140px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.06)',
+        }}>
+          <div style={{ position: 'absolute', inset: `${BEZEL}cqw`, overflow: 'hidden', borderRadius: `${RADIUS - BEZEL}cqw` }}>
+            {/* Chrome rasters a perspective layer at its layout size, so the screen is laid out at twice its size and halved */}
+            <div style={{ position: 'absolute', left: 0, top: 0, width: '200%', height: '200%', transformOrigin: '0 0', transform: 'scale(0.5)' }}><ScreenLoop live={live} bar={0} /></div>
+            {/* The glass catching the light */}
+            <div aria-hidden style={{ ...fill, background: 'linear-gradient(118deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0) 46%)', pointerEvents: 'none' }} />
+          </div>
+        </div>
       </div>
+      {/* Whatever runs off the frame falls into shadow */}
+      <div aria-hidden style={{ ...fill, background: 'linear-gradient(270deg, rgba(0,0,0,0) 80%, rgba(0,0,0,0.4) 100%)', pointerEvents: 'none' }} />
     </div>
   )
 }
@@ -143,25 +149,28 @@ function ColorDiaryCover({ hovered }) {
   )
 }
 
-// A cover's videos and images only start downloading as its card nears the viewport, so they never compete with the 3D scene on the first screen.
+// A cover's videos and images only start downloading as its card nears the viewport, so they never
+// compete with the 3D scene on the first screen. It moves once most of it is in view, and keeps
+// moving while it scrolls partly away, until it is gone.
 export default function Cover(props) {
   const ref = useRef(null)
   const [near, setNear] = useState(false)
-  useEffect(() => {
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect() } }, { rootMargin: '300px 0px' })
-    io.observe(ref.current)
-    return () => io.disconnect()
-  }, [])
-  return <div ref={ref} style={fill}>{near && <CoverMedia {...props} />}</div>
-}
-
-function CoverMedia({ id, hovered }) {
   const [live, setLive] = useState(false)
   useEffect(() => {
-    if (!hovered) { setLive(false); return }
-    const timer = setTimeout(() => setLive(true), MOTION_DELAY)
-    return () => clearTimeout(timer)
-  }, [hovered])
+    const el = ref.current
+    const nearby = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); nearby.disconnect() } }, { rootMargin: '300px 0px' })
+    const seen = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) setLive(false)
+      else if (e.intersectionRatio >= IN_VIEW) setLive(true)
+    }, { threshold: [0, IN_VIEW] })
+    nearby.observe(el)
+    seen.observe(el)
+    return () => { nearby.disconnect(); seen.disconnect() }
+  }, [])
+  return <div ref={ref} style={fill}>{near && <CoverMedia {...props} live={live} />}</div>
+}
+
+function CoverMedia({ id, hovered, live }) {
   if (id === 'cisco') return <CiscoCover />
   if (id === 'bosch') return <BoschCover live={live} />
   if (id === 'bytedance') return <ByteDanceCover hovered={hovered} live={live} />

@@ -63,7 +63,7 @@ function Pill({ tone, icon: Glyph, children }) {
 function TopBar() {
   return (
     <div className="csd-top">
-      <img src="/cisco-ui/cisco-logo.png" alt="" className="csd-logo" />
+      <img src="/cisco-ui/cisco-logo.svg" alt="" className="csd-logo" />
       <span className="csd-product">Intersight</span>
       <span className="csd-search"><Search {...ICON} />Search</span>
       <RotateCw {...ICON} className="csd-tool" style={{ left: 1134 }} />

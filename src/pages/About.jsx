@@ -41,10 +41,13 @@ export default function About() {
       <section style={{ flex: '1 1 0', minWidth: 0, maxWidth: 620 }}>
         <h1 style={{ fontFamily: F, fontWeight: 400, fontSize: 'clamp(28px, 3.4vw, 48px)', lineHeight: 1.16, letterSpacing: '-0.03em', color: '#edf0f7', margin: '0 0 20px' }}>Hi, I'm Finnick.</h1>
         <p style={{ fontFamily: F, fontSize: 19, lineHeight: '31px', color: SUB, margin: '0 0 22px' }}>
-          I'm a product designer who's curious about how people experience things, and how small details shape those moments. Most recently I worked on <span style={{ color: INK }}>Cisco</span> Intersight, and before that designed internal platforms at <span style={{ color: INK }}>ByteDance</span> and <span style={{ color: INK }}>Bosch</span>.
+          I'm a product designer who loves figuring out how things work, questioning why they're the way they are, and imagining how they could be better.
+        </p>
+        <p style={{ fontFamily: F, fontSize: 19, lineHeight: '31px', color: SUB, margin: '0 0 22px' }}>
+          I've had the chance to work with some pretty interesting people at <span style={{ color: INK }}>Cisco</span>, <span style={{ color: INK }}>ByteDance</span>, and <span style={{ color: INK }}>Bosch</span>, tackling complex problems and learning something new along the way. I'm currently finishing my Master's at the <span style={{ color: INK }}>University of Washington</span>, where I've been exploring new ideas and experimenting with emerging technologies.
         </p>
         <p style={{ fontFamily: F, fontSize: 19, lineHeight: '31px', color: SUB, margin: 0 }}>
-          I grew up in Chengdu, a city where different rhythms of life coexist naturally. It taught me to observe quietly and notice how environments shape the way people feel. Today I'm finishing my Master's in HCI at the <span style={{ color: INK }}>University of Washington</span>.
+          I grew up in Chengdu, China, and have always been the kind of person who gets curious about just about anything. Outside of work, I'm into fashion, music, and discovering things I didn't know I'd love. I tend to notice the little details, ask a lot of questions, and occasionally spend way too much time on something just because I think it could be better.
         </p>
 
         <div style={{ marginTop: 56, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.1)' }}>

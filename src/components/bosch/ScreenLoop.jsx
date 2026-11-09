@@ -19,7 +19,7 @@ function hotPoint(root, hot) {
   return [x, y]
 }
 
-export default function ScreenLoop({ live }) {
+export default function ScreenLoop({ live, bar = BAR }) {
   const outer = useRef(null), canvas = useRef(null)
   const [size, setSize] = useState([1, 1])
   const [s, setS] = useState(START)
@@ -57,8 +57,8 @@ export default function ScreenLoop({ live }) {
     <div ref={outer} style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#fff', fontFamily: FONT }}>
       <style>{KEYFRAMES}</style>
       <div ref={canvas} style={{ position: 'absolute', left: 0, top: 0, width: CW, height: CH, overflow: 'hidden', transformOrigin: '0 0', transform: `scale(${size[0] / CW}, ${size[1] / CH})` }}>
-        {/* The app sits below the notch, as it would under a menu bar */}
-        <div style={{ position: 'absolute', left: 0, right: 0, top: BAR, bottom: 0 }}><TicketDetail s={s} /></div>
+        {/* On a laptop the app sits below the notch, as it would under a menu bar */}
+        <div style={{ position: 'absolute', left: 0, right: 0, top: bar, bottom: 0 }}><TicketDetail s={s} /></div>
         <div style={{ position: 'absolute', left: 0, top: 0, zIndex: 50, pointerEvents: 'none', transform: `translate(${cur[0]}px, ${cur[1]}px)`, transition: 'transform .6s cubic-bezier(.6,0,.25,1)' }}>
           <svg width="26" height="26" viewBox="0 0 24 24" style={{ position: 'absolute', left: -4, top: -3, filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.3))' }}><path d="M4 2l15 10.5-6.6 1.3 3.8 7.3-2.8 1.4-3.8-7.3L4 20z" fill="#111" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" /></svg>
         </div>
