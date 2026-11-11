@@ -43,12 +43,19 @@ export default function ScreenLoop({ live, bar = BAR }) {
       if (alive) setS(x => ({ ...x, press: null, ...then }))
     }
     ;(async () => {
-      await sleep(250)
-      await click('btn-remind', { modal: 'remind', focus: 'msg' })
-      await sleep(250)
-      for (let c = 1; c <= MESSAGE.length && alive; c++) { setS(x => ({ ...x, msg: MESSAGE.slice(0, c) })); await sleep(18) }
-      if (!alive) return
-      await click('modal-ok', { modal: null, focus: null, toast: 'Reminder sent to Wei KANG', logs: [LOG] })
+      // Plays for as long as it is in view: the sent reminder holds, then the ticket returns to how it started
+      while (alive) {
+        await sleep(250)
+        await click('btn-remind', { modal: 'remind', focus: 'msg' })
+        await sleep(250)
+        for (let c = 1; c <= MESSAGE.length && alive; c++) { setS(x => ({ ...x, msg: MESSAGE.slice(0, c) })); await sleep(18) }
+        if (!alive) return
+        await click('modal-ok', { modal: null, focus: null, toast: 'Reminder sent to Wei KANG', logs: [LOG] })
+        await sleep(2600)
+        if (!alive) return
+        setS(START); setCur(REST)
+        await sleep(900)
+      }
     })()
     return () => { alive = false }
   }, [live])
