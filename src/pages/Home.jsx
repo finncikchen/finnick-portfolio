@@ -16,6 +16,8 @@ import thumbBytedance  from '../assets/images/thumb-bytedance.webp'
 import thumbBosch      from '../assets/images/thumb-bosch.png'
 import thumbYhlo       from '../assets/images/thumb-yhlo.png'
 import thumbFlowerStar from '../assets/images/thumb-flower-star.png'
+import thumbWenhong    from '../assets/images/thumb-wenhong.webp'
+import drupaLogo       from '../assets/images/wenhong/drupa-logo.png'
 import Cover from '../components/HomeCovers'
 import thumbColorDiary from '../assets/images/thumb-colordiary.webp'
 // Cisco thumbnail not yet available — card uses gradient placeholder
@@ -56,21 +58,28 @@ const PROJECTS = [
     id: 'flower-star', title: 'Flower Star',
     subtitle: 'An original mobile game designed from concept to play.',
     tags: ['Gaming', 'Mobile App'], year: '2025',
-    category: 'visuals', thumb: thumbFlowerStar, cover: true, objectPos: 'center top',
+    category: 'products', thumb: thumbFlowerStar, cover: true, objectPos: 'center top',
   },
   {
     id: 'color-diary', title: 'Color Diary',
     subtitle: 'A vibe-coded cover generator reaching 80K+ views on RedNote.',
     tags: ['Creator Tools', 'Vibe Coding', '8K+ Likes & Saves'], year: '2026',
-    category: 'visuals', thumb: thumbColorDiary, cover: true, objectPos: 'center center',
+    category: 'products', thumb: thumbColorDiary, cover: true, objectPos: 'center center',
     url: 'https://colordiary.finnickchen.site/',
+  },
+  {
+    id: 'wenhong', title: 'Wenhong · Machinery Design',
+    subtitle: 'Industrial design for packaging machinery, driven by brand gene extraction.',
+    tags: ['Industrial Design', 'Brand Language'], year: '2022',
+    category: 'hardware', thumb: thumbWenhong, cover: false, objectPos: 'center 55%',
+    mark: drupaLogo,
   },
 ]
 
 const FILTERS = [
   { key: 'all',      label: 'All' },
   { key: 'products', label: 'Products' },
-  { key: 'visuals',  label: 'Visuals' },
+  { key: 'hardware', label: 'Hardware' },
 ]
 
 export default function Home() {
@@ -365,6 +374,7 @@ function ProjectCard({ project: p }) {
             }}
           />
         ) : null}
+        {p.mark && <img src={p.mark} alt="Exhibited at drupa" style={{ position: 'absolute', right: '3.2%', top: '5.6%', width: '6%', minWidth: 40, height: 'auto', pointerEvents: 'none' }} />}
       </div>
 
       {/* info */}

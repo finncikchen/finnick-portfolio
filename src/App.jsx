@@ -12,6 +12,7 @@ const Cisco = lazy(() => import('./pages/Cisco'))
 const Bosch = lazy(() => import('./pages/Bosch'))
 const Yhlo = lazy(() => import('./pages/Yhlo'))
 const FlowerStar = lazy(() => import('./pages/FlowerStar'))
+const Wenhong = lazy(() => import('./pages/Wenhong'))
 const Locked = lazy(() => import('./pages/Locked'))
 const Admin = lazy(() => import('./pages/Admin'))
 
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/work/bosch" element={<Bosch />} />
         <Route path="/work/yhlo" element={<Yhlo />} />
         <Route path="/work/flower-star" element={<FlowerStar />} />
+        <Route path="/work/wenhong" element={<Wenhong />} />
         <Route path="/work" element={<Navigate to="/" replace />} />
         <Route path="/work/:id" element={<Locked />} />
       </Routes>
