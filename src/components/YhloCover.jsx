@@ -1,6 +1,7 @@
 import { Scaled } from './bosch/Dashboard'
 import { TrackHome } from './yhlo/Track'
 import cover from '../assets/images/yhlo/cover-dark.webp'
+import muse from '../assets/images/yhlo/muse-award.png'
 
 // Home-page card cover for YHLO: studio render (1672 x 941), always centered and covering the card,
 // with the live Home UI on its display. Overlay boxes are in render pixels, converted to %.
@@ -19,6 +20,7 @@ export default function YhloCover({ hovered, live }) {
         </div>
         <svg viewBox="0 0 18 18" style={pct(RUN)}><circle cx="9" cy="9" r="9" fill="#2bb7c4" /><text x="9" y="11" textAnchor="middle" fontSize="5.5" fontWeight="700" fill="#fff" fontFamily="Inter, sans-serif">RUN</text></svg>
       </div>
+      <img src={muse} alt="MUSE Design Awards" style={{ position: 'absolute', right: '3.2cqw', top: '3.2cqw', width: 'clamp(84px, 13cqw, 150px)', height: 'auto', mixBlendMode: 'multiply' }} />
     </div>
   )
 }
