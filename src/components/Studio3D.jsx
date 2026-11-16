@@ -10,12 +10,12 @@ const CENTER = [0.7, 2.2], VIEW_HEIGHT = 7.4
 const FIGURE_SCALE = 4.2, FIGURE_AT = [0, -4.2, -0.45], FIGURE_TURN = 0
 const PLANT_AT = [-3.74, 1.05, 0.5]
 const TYPE = { RightArm: [-0.2, -0.95, 0.2], RightForeArm: [0.2, -0.1, 1], RightHand: [0.2, -0.1, 1] }
-const MUG_HOME = [-1.35, 0, 0.85], MOUTH = [0, 1.47, 0.105], MUG_R = 0.06, MUG_H = 0.126, HANDLE_UP = 0.065, HANDLE_OUT = 0.122
+const MUG_HOME = [-1.35, 0, 0.85], MOUTH = [0, 1.47, 0.105], MUG_R = 0.06, MUG_H = 0.126, HANDLE_UP = 0.065, HANDLE_OUT = 0.124
 const HOLD = { g: [-0.25, 0, 0.97], u: [0, 1, 0] }, SIP = { g: [0.05, 0.47, 0.88], u: [0.03, 0.88, -0.47] }
 const POSES = {
   reach: { RightArm: [-0.6, -0.6, 0.55], RightForeArm: [-0.55, -0.25, 0.8], RightHand: [-0.55, -0.25, 0.8] },
   lift: { RightArm: [-0.12, -0.42, 0.9], RightForeArm: [0.62, 0.78, 0.12], RightHand: [0.7, 0.65, 0.25] },
-  wave: { RightArm: [-0.8, -0.2, 0.45], RightForeArm: [-0.22, 1, 0.14] },
+  wave: { RightArm: [-0.74, -0.46, 0.42], RightForeArm: [-0.34, 1, 0.16] },
 }
 
 function drawWindow(g, w, h) {
@@ -128,7 +128,7 @@ export default function Studio3D() {
       }
       const palmSide = (g, u) => new THREE.Vector3().crossVectors(u, g).normalize()
       // wrist position for a mug held by its handle: fingers through the loop, body of the mug beyond the palm
-      const wristFor = (base, g, u) => base.clone().addScaledVector(u, HANDLE_UP).addScaledVector(palmSide(g, u), -HANDLE_OUT).addScaledVector(g.clone().normalize(), -0.062)
+      const wristFor = (base, g, u) => base.clone().addScaledVector(u, HANDLE_UP).addScaledVector(palmSide(g, u), -HANDLE_OUT).addScaledVector(g.clone().normalize(), -0.045)
       const type = { g: V(TYPE.RightHand).normalize(), u: V([1, 0, 0]) }
       const typeWrist = shoulder.clone().addScaledVector(V(TYPE.RightArm).normalize(), L1).addScaledVector(V(TYPE.RightForeArm).normalize(), L2)
       const home = { g: V(HOLD.g).normalize(), u: V(HOLD.u).normalize() }, lips = { g: V(SIP.g).normalize(), u: V(SIP.u).normalize() }
@@ -196,7 +196,10 @@ export default function Studio3D() {
         carry.getPoint(P.lift, base)
         const heldG = home.g.clone().lerp(lips.g, P.lift).normalize(), heldU = home.u.clone().lerp(lips.u, P.tilt * 0.65 + P.lift * 0.35).normalize()
         const g = type.g.clone().lerp(heldG, P.reach).normalize(), u = type.u.clone().lerp(heldU, P.reach).normalize()
-        const wrist = typeWrist.clone().lerp(wristFor(base, heldG, heldU), P.reach)
+        // the keyboard and the handle are on opposite sides of the mug: the hand rises over it, then comes down beside the handle
+        const held = wristFor(base, heldG, heldU), over = Math.sin(Math.PI * P.reach)
+        const wrist = typeWrist.clone().lerp(held, P.reach * P.reach * (3 - 2 * P.reach))
+        wrist.y += 0.2 * over ** 0.7; wrist.addScaledVector(palmSide(heldG, heldU), -0.08 * over)
         wrist.y += tap * 0.02 * (1 - P.reach)
         const solved = placeArm(wrist, g, u, P.lift * P.reach)
         if (P.wave > 0.001) {
@@ -211,7 +214,7 @@ export default function Studio3D() {
         armGlow.intensity = 1.5 * Math.min(1, P.wave * 2.5)
         const smile = gsap.parseEase('sine.inOut')(Math.min(1, P.wave * 1.6))
         fingers.morphTargetInfluences[1] = 0.8 * smile; smileLine.material.opacity = smile; smileLine.visible = smile > 0.01
-        fingers.morphTargetInfluences[0] = Math.min(1, Math.max(0, (P.reach - 0.55) / 0.4)) * 0.82 * (1 - P.wave)
+        fingers.morphTargetInfluences[0] = Math.min(1, Math.max(0, (P.reach - 0.55) / 0.4)) * 0.6 * (1 - P.wave)
         point('LeftForeArm', SEATED.LeftForeArm[0], SEATED.LeftForeArm[1] - tap * away, SEATED.LeftForeArm[2])
         q.setFromEuler(new THREE.Euler(-0.1 + gaze.y * calm - P.tilt * 0.3 + P.look * 0.1 + Math.sin(t * 0.7) * 0.012 * sway, -P.look * 0.3 + gaze.x * calm + Math.sin(t * 0.43) * 0.02 * sway, P.wave * 0.07))
         bones.Head.node.quaternion.copy(q.multiply(bones.Head.restWorld).premultiply(bones.Head.parentRest.clone().invert()))
