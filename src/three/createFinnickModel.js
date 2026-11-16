@@ -271,7 +271,7 @@ function buildMug() {
   mesh('mug-body', new THREE.CylinderGeometry(0.31, 0.3, 0.66, 48), M.mug, mug, [0, 0.33, 0])
   mesh('mug-base', new THREE.CircleGeometry(0.3, 48), Object.assign(M.mug.clone(), { emissive: M.mug.color.clone(), emissiveIntensity: 0.12 }), mug, [0, -0.002, 0], [1, 1, 1], [Math.PI / 2, 0, 0])
   mesh('mug-coffee', new THREE.CircleGeometry(0.27, 40), M.dark, mug, [0, 0.655, 0], [1, 1, 1], [-Math.PI / 2, 0, 0])
-  mesh('mug-handle', new THREE.TorusGeometry(0.15, 0.032, 14, 40), M.mug, mug, [0.33, 0.34, 0], [0.9, 1, 1])
+  mesh('mug-handle', new THREE.TorusGeometry(0.18, 0.032, 14, 40), M.mug, mug, [0.37, 0.34, 0])
   mesh('mug-emblem', new THREE.TorusGeometry(0.1, 0.014, 10, 36), M.mugLight, mug, [-0.08, 0.34, 0.3], [0.8, 1, 1])
   mug.traverse((o) => { o.castShadow = false })
   return mug
