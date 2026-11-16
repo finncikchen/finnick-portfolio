@@ -617,7 +617,7 @@ export default function Cisco() {
           </section>
           {/* the picture: the live product page laid back in space and running off the panel */}
           <div style={{ position: 'relative', height: 'clamp(230px, 50vw, 760px)', perspective: '2400px', perspectiveOrigin: '50% 0%' }}>
-            <div style={{ position: 'absolute', left: '14%', top: '7%', width: '108%', aspectRatio: '1512 / 738', borderRadius: 16, overflow: 'hidden', background: '#f6f6f7',
+            <div data-ss-fill style={{ position: 'absolute', left: '14%', top: '7%', width: '108%', aspectRatio: '1512 / 738', borderRadius: 16, overflow: 'hidden', background: '#f6f6f7',
               transform: 'rotateX(34deg) rotateZ(-9deg) rotateY(8deg)', transformOrigin: '20% 0%',
               boxShadow: '0 0 0 1px rgba(20,30,50,0.10), 0 2px 4px rgba(20,30,50,0.06), 0 70px 140px -30px rgba(20,40,80,0.5), 0 30px 60px -30px rgba(20,40,80,0.35)' }}>
               <Suspense fallback={null}><ServersDemo /></Suspense>
