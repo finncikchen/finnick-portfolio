@@ -46,7 +46,8 @@ function Shell({ className, face, children }) {
   )
 }
 
-function Insight({ face }) {
+// The card on its own, for pages that show it outside the cover's scene
+export function Insight({ face }) {
   return (
     <Shell className="ic-insight" face={face}>
       <Skeleton />
