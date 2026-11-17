@@ -1,6 +1,7 @@
 import { ContactCTA, FooterNav } from '../components/CaseKit'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
+import { Insight } from '../components/cisco/InsightCover'
 
 const ServersDemo = lazy(() => import('../components/cisco/ServersDemo'))
 
@@ -266,7 +267,7 @@ function Stage({ children }) {
   )
 }
 
-function SolutionRow({ n, lines, body, src }) {
+function SolutionRow({ n, lines, body, src, bg }) {
   return (
     <div>
       <p style={{ fontFamily: F, fontSize: 14, fontWeight: 500, letterSpacing: '0.02em', color: SUB, margin: '0 0 16px' }}>{n}</p>
@@ -274,7 +275,7 @@ function SolutionRow({ n, lines, body, src }) {
         {lines.join(' ')}
       </h3>
       <p style={{ fontFamily: F, fontSize: 17, lineHeight: 1.55, color: SUB, maxWidth: 760, margin: '20px 0 ' + HEAD }}>{body}</p>
-      <div style={{ borderRadius: 28, padding: 'clamp(16px, min(4.5vw, 6vh), 64px)', background: '#e9ecf1' }}>
+      <div style={{ borderRadius: 28, padding: 'clamp(16px, min(4.5vw, 6vh), 64px)', background: `#c4daf0 url(/cisco-ui/${bg}.webp) center / cover no-repeat` }}>
         <video src={src} autoPlay loop muted playsInline preload="metadata"
           style={{ width: 'min(100%, calc((100vh - 220px) * 3024 / 1552))', aspectRatio: '3024 / 1552', height: 'auto', display: 'block', margin: '0 auto', borderRadius: 12, boxShadow: '0 1px 2px rgba(20,30,50,0.06), 0 24px 56px -24px rgba(20,30,50,0.28)' }} />
       </div>
@@ -432,6 +433,7 @@ function BeforeAfter() {
 
 // One card at its real size on a quiet tile, with the four states listed beside it. The list steps through on its own
 // and each step can be picked by hand; only the current step shows its sentence.
+const SF_FACE = { generating: 'load', ready: 'ready', running: 'run', done: 'done' }
 function StateFlow({ states }) {
   const [i, setI] = useState(0)
   useEffect(() => {
@@ -445,7 +447,18 @@ function StateFlow({ states }) {
         .sf-item{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;padding:14px 0;border-top:1px solid #eceef2;cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%;font:inherit}
         .sf-item:first-child{border-top:0}
         .sf-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.2,.7,.2,1)}.sf-item[aria-current=true] .sf-body{grid-template-rows:1fr}
-        .sf-body>span{overflow:hidden}`}</style>
+        .sf-body>span{overflow:hidden}
+        .sf-card{height:210px;--ic-shadow:0 1px 2px rgba(40,60,100,.06),0 16px 32px -12px rgba(40,60,100,.22)}
+        .sf-card .ic-scene{overflow:visible}
+        .sf-card .ic-insight{opacity:1!important;filter:none!important;transform:scale(1.3)!important;transition:none!important}
+        @media(max-width:1100px){.sf-card .ic-insight{transform:scale(1.08)!important}}
+        @media(max-width:640px){.sf-card{height:130px}.sf-card .ic-insight{transform:scale(.68)!important}}
+        .sf-card .ic-plate{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+        .sf-card [data-face='load'] .ic-plate{animation-name:sf-glass}
+        @keyframes sf-glass{from{opacity:.4}to{opacity:.62}}
+        .sf-card .ic-bar{background:rgba(110,135,175,.18)}
+        .sf-card .ic-bar b{background:linear-gradient(90deg,transparent,rgba(90,140,220,.42) 70%,transparent)}
+        .sf-card .ic-pulse b+b{background:#1a9fe0}`}</style>
       <div>
         {states.map(([k, tt, d], j) => (
           <button type="button" key={k} className="sf-item" aria-current={j === i} onClick={() => setI(j)}>
@@ -457,14 +470,18 @@ function StateFlow({ states }) {
           </button>
         ))}
       </div>
-      <div style={{ borderRadius: 24, background: '#f3f5f8', padding: 'clamp(20px, min(4.5vw, 8vh), 64px) clamp(16px, 4vw, 56px)' }}>
-        <div style={{ position: 'relative', aspectRatio: '1294 / 456', maxWidth: 620, margin: '0 auto' }}>
-          {states.map(([k, tt], j) => (
-            <video key={k} src={`/cisco-ui/state-${k}.mp4`} poster={`/cisco-ui/state-${k}.webp`} autoPlay muted loop playsInline preload="metadata"
-              aria-label={`Insight card, ${tt.toLowerCase()} state`} aria-hidden={j !== i}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderRadius: 14, mixBlendMode: 'multiply',
-                opacity: j === i ? 1 : 0, transform: `scale(${j === i ? 1 : 0.985})`, transition: 'opacity .6s ease, transform .8s cubic-bezier(.2,.7,.2,1)' }} />
-          ))}
+      <div style={{ position: 'relative', isolation: 'isolate', overflow: 'hidden', borderRadius: 24, padding: 'clamp(20px, min(4.5vw, 8vh), 64px) clamp(16px, 4vw, 56px)' }}>
+        {/* frosted glass: the wash, diffused under a milky pane with a lit edge, so the product's own card films stay true on it */}
+        <Wash pos="right bottom" sat={0.85} />
+        <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: -1, borderRadius: 24, background: 'linear-gradient(160deg, rgba(255,255,255,0.5), rgba(255,255,255,0.3))',
+          backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.85), inset 0 1px 0 rgba(255,255,255,1), inset 0 0 60px rgba(255,255,255,0.35)' }} />
+        <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: -1, opacity: 0.5, mixBlendMode: 'soft-light', backgroundImage: NOISE, backgroundSize: '160px 160px' }} />
+        {/* the card itself, the same component as the home cover, set straight on the glass with nothing behind it */}
+        <div className="ic sf-card" style={{ position: 'relative', fontFamily: 'Inter, system-ui, sans-serif' }}>
+          <div className="ic-scene" data-scene="ask" data-live>
+            <Insight face={SF_FACE[states[i][0]]} />
+          </div>
         </div>
       </div>
     </div>
@@ -591,37 +608,82 @@ function CountUp({ to, suffix = '' }) {
   return <span ref={ref} style={{ fontVariantNumeric: 'tabular-nums' }}>{v}{suffix}</span>
 }
 
+// The hero picture: a render of a monitor on a soft sky, with the live product page set into its screen.
+// The screen's corners are measured on the 1536 x 1024 picture; a phone column shows the monitor closer.
+function MonitorShot() {
+  const ref = useRef(null)
+  const [view, setView] = useState(null)
+  useEffect(() => {
+    const el = ref.current
+    const fit = () => {
+      const w = el.clientWidth, near = w < 640
+      setView({ scale: w / (near ? 1040 : 1536), x: near ? -248 : 0, y: near ? 0 : -101 })
+    }
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className="shot-img">
+      <div style={{ position: 'absolute', left: 0, top: 0, width: 1536, height: 1024, transformOrigin: '0 0', visibility: view ? 'visible' : 'hidden',
+        transform: view ? `scale(${view.scale}) translate(${view.x}px, ${view.y}px)` : 'none' }}>
+        <img src="/cisco-ui/hero-monitor.webp" alt="" width="1536" height="1024" style={{ display: 'block' }} />
+        <div style={{ position: 'absolute', left: 0, top: 0, width: 1512, height: 840, overflow: 'hidden', background: 'linear-gradient(90deg, #fbfbfb 15.34%, #f6f6f7 15.34%)', transformOrigin: '0 0',
+          transform: 'matrix3d(0.54565761,-0.024282346,0,-3.3982258e-05,-0.0016167954,0.57044589,0,-1.3406263e-06,0,0,1,0,319,253,0,1)' }}>
+          <div style={{ width: 1512, height: 738 }}>
+            <Suspense fallback={null}><ServersDemo /></Suspense>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Cisco() {
   return (
     <div style={{ background: LIGHT, color: INK, fontFamily: F, minHeight: '100vh' }}>
 
       {/* ── HERO ─────────────────────────────────────────── */}
       <div style={{ padding: 12 }}>
-        <div style={{ position: 'relative', zIndex: 2, borderRadius: 28, overflow: 'hidden' }}>
-          <Wash pos="center top" />
-          <Header minimal darkLogo />
-          <section style={{ ...WIDE, position: 'relative', zIndex: 1, paddingTop: 'clamp(28px, 4.5vw, 64px)', paddingBottom: 'clamp(16px, 2vw, 32px)' }}>
-            <p style={{ display: 'inline-flex', alignItems: 'center', gap: 14, fontFamily: F, fontSize: 14, fontWeight: 500, letterSpacing: '0.02em', color: SUB, margin: '0 0 28px' }}>
-              <span role="img" aria-label="Cisco" style={{ display: 'block', height: 32, aspectRatio: '114 / 72', background: INK, WebkitMask: 'url(/cisco-ui/cisco-logo.svg) center / contain no-repeat', mask: 'url(/cisco-ui/cisco-logo.svg) center / contain no-repeat' }} />
-              <span aria-hidden style={{ width: 1, height: 20, background: 'rgba(0,0,0,0.16)' }} />
-              <a href="https://www.cisco.com/site/us/en/products/computing/hybrid-cloud-operations/intersight-platform/index.html" target="_blank" rel="noreferrer" className="hero-link"
-                style={{ color: 'inherit', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                Intersight
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-              </a>
-            </p>
-            <h1 style={{ fontFamily: F, fontWeight: 500, fontSize: 'clamp(34px, 4.6vw, 64px)', lineHeight: 1.06, letterSpacing: '-0.04em', color: INK, margin: 0 }}>
-              From a page title to an adaptive, <span style={{ whiteSpace: 'nowrap' }}>AI-powered</span> operational solution
-            </h1>
-            <style>{`.hero-link{transition:color .2s}.hero-link:hover{color:${INK}!important}`}</style>
-          </section>
-          {/* the picture: the live product page laid back in space and running off the panel */}
-          <div style={{ position: 'relative', height: 'clamp(230px, 50vw, 760px)', perspective: '2400px', perspectiveOrigin: '50% 0%' }}>
-            <div data-ss-fill style={{ position: 'absolute', left: '14%', top: '7%', width: '108%', aspectRatio: '1512 / 738', borderRadius: 16, overflow: 'hidden', background: '#f6f6f7',
-              transform: 'rotateX(34deg) rotateZ(-9deg) rotateY(8deg)', transformOrigin: '20% 0%',
-              boxShadow: '0 0 0 1px rgba(20,30,50,0.10), 0 2px 4px rgba(20,30,50,0.06), 0 70px 140px -30px rgba(20,40,80,0.5), 0 30px 60px -30px rgba(20,40,80,0.35)' }}>
-              <Suspense fallback={null}><ServersDemo /></Suspense>
-            </div>
+        <div className="hero-panel" style={{ position: 'relative', zIndex: 2, borderRadius: 28, overflow: 'hidden' }}>
+          <div aria-hidden style={{ position: 'absolute', inset: 0, background: '#a1c2e4' }} />
+          <Header minimal />
+          {/* one picture: the copy down the left, the product on a monitor running off the right and the foot */}
+          <div className="hero-stage">
+            <section className="hero-copy">
+              <p style={{ display: 'inline-flex', alignItems: 'center', gap: 17, fontFamily: F, fontSize: 17, fontWeight: 500, letterSpacing: '0.02em', margin: 0 }}>
+                <span role="img" aria-label="Cisco" style={{ display: 'block', height: 40, aspectRatio: '114 / 72', background: 'currentColor', WebkitMask: 'url(/cisco-ui/cisco-logo.svg) center / contain no-repeat', mask: 'url(/cisco-ui/cisco-logo.svg) center / contain no-repeat' }} />
+                <span aria-hidden style={{ width: 1, height: 25, background: 'currentColor', opacity: 0.4 }} />
+                <a href="https://www.cisco.com/site/us/en/products/computing/hybrid-cloud-operations/intersight-platform/index.html" target="_blank" rel="noreferrer" className="hero-link"
+                  style={{ color: 'inherit', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  Intersight
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                </a>
+              </p>
+              <h1 className="hero-title" style={{ fontFamily: F, fontWeight: 500, letterSpacing: '-0.04em', color: '#fff', margin: 0 }}>
+                <span className="hero-l1">From a page title to an adaptive, </span><span className="hero-l2"><span style={{ whiteSpace: 'nowrap' }}>AI-powered</span> operational solution</span>
+              </h1>
+            </section>
+            <div className="hero-shot" aria-hidden><MonitorShot /></div>
+            <style>{`
+              .hero-link{transition:opacity .2s}.hero-link:hover{opacity:.7}
+              .hero-stage{position:relative;z-index:1}
+              .hero-copy{position:relative;z-index:2;display:flex;flex-direction:column;gap:14px;padding:4px 20px 0}
+              .hero-copy>p{color:rgba(255,255,255,.9)}
+              .hero-title{font-size:clamp(30px,8.4vw,44px);line-height:1.06;text-wrap:balance}
+              .shot-img{position:relative;aspect-ratio:1040 / 1000;margin-top:-17%;overflow:hidden}
+              @media (min-width:640px){
+                .hero-panel{container-type:inline-size}
+                .hero-stage{--sw:clamp(60cqw,calc((100vh - 110px) * 1.7376),100cqw);--ox:calc((100cqw - var(--sw)) / 2);background:linear-gradient(180deg, #a1c2e4 0.0%, #abc9e8 12.5%, #b7d2ed 25.0%, #c3d9f1 37.5%, #cddff2 50.1%, #d8e6f5 62.5%, #e3ecf8 75.0%, #eaf0f8 87.5%, #eaf1f7 100.0%)}
+                .hero-copy{position:absolute;inset:0;display:block;padding:0;pointer-events:none}
+                .hero-copy>p{position:absolute;left:3.6cqw;bottom:calc(var(--sw) * .03);pointer-events:auto;color:#3b4658}
+                .hero-title{position:absolute;inset:0;padding:0 0 0 3.6cqw;font-size:calc(var(--sw) * .044);line-height:1;text-wrap:nowrap;clip-path:polygon(evenodd, 0 0, 100cqw 0, 100cqw 100cqw, 0 100cqw, 0 0, calc(var(--ox) + var(--sw) * 0.19954) calc(var(--sw) * 0.24023), calc(var(--ox) + var(--sw) * 0.19954) calc(var(--sw) * 0.09115), calc(var(--ox) + var(--sw) * 0.20117) calc(var(--sw) * 0.08952), calc(var(--ox) + var(--sw) * 0.79102) calc(var(--sw) * 0.07227), calc(var(--ox) + var(--sw) * 0.80273) calc(var(--sw) * 0.07878), calc(var(--ox) + var(--sw) * 0.80273) calc(var(--sw) * 0.24023), calc(var(--ox) + var(--sw) * 0.19954) calc(var(--sw) * 0.24023))}
+                .hero-l1,.hero-l2{display:block}
+                .hero-l2{opacity:.74}
+                .shot-img{width:var(--sw);margin:0 auto;aspect-ratio:1536 / 884;-webkit-mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+              }
+            `}</style>
           </div>
         </div>
       </div>
@@ -709,7 +771,7 @@ export default function Cisco() {
             { n: 'Understand', title: 'Generate contextual insights from what the server is doing', body: 'When a user opens a server, the system reads its context and current condition and writes an Overview of what is happening and what needs attention.', src: '/cisco-ui/solution-01.mov' },
             { n: 'Act', title: 'Turn every insight into a clear next step', body: 'Different conditions lead to different insights, and each one links to a relevant action through the Insight-to-Action card. The user always decides whether to run it.', src: '/cisco-ui/solution-02.mov' },
             { n: 'Scale', title: 'Resolve the same issue across many servers in one decision', body: 'Instead of inspecting servers one at a time, users find related servers that share a condition and act on them together.', src: '/cisco-ui/solution-03.mov' },
-          ].map((st, i) => <SolutionRow key={st.n} n={`0${i + 1}  ${st.n}`} lines={[st.title]} body={st.body} src={st.src} />)}
+          ].map((st, i) => <SolutionRow key={st.n} n={`0${i + 1}  ${st.n}`} lines={[st.title]} body={st.body} src={st.src} bg={`flow-${i + 1}`} />)}
         </div>
       </section>
 
