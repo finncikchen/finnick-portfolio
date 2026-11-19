@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { C, FONT, KEYFRAMES } from './kit'
+import { C, KEYFRAMES } from './kit'
 import { TicketList, TicketDetail, Posting, PostingForm, ReminderSetting, Inbox } from './screens'
 
-// Scripted walkthroughs of the Phase 2 prototype, played on the live UI.
-// Actions: set (merge state) · click (move cursor to data-hot, press) · type (into state key) · fill (count up) · wait
+// The Phase 2 flows on the live UI. Each is shown frozen on its key moment (SHOTS below).
+// `steps` keeps the scripted walkthrough: set (merge state) · click (data-hot) · type (into state key) · fill (count up) · wait
 const SCREENS = { list: TicketList, detail: TicketDetail, posting: Posting, postingForm: PostingForm, reminder: ReminderSetting, inbox: Inbox }
 const LOG_REMIND = ['Manual reminder sent', '"Dear Wei, please upload the invoice number ASAP."', 'Cheng ZHANG · just now']
 const LOG_INVOICE = ['Invoice number uploaded', 'INV-2025-004187 · matched to DP 4532034316', 'Wei KANG · just now']
@@ -31,85 +31,41 @@ export const FLOWS = [
 ]
 
 const CW = 1440, CH = 900
-export default function FlowDemo() {
-  const outer = useRef(null), canvas = useRef(null)
-  const [scale, setScale] = useState(0.6)
-  const [inView, setInView] = useState(false)
-  const [flow, setFlow] = useState(0)
-  const [s, setS] = useState(FLOWS[0].start)
-  const [cur, setCur] = useState([900, 600])
-  const [press, setPress] = useState(0)
-  const [prog, setProg] = useState(0)
+// The six flows laid out, each frozen on the moment that tells its story and cropped to where it happens,
+// so a reader scrolling past gets all six without waiting for a player.
+// crop: [x, y, w, h] on the 1440 x 900 canvas (full screen: each flow has its own full-width container)
+const LOG_COMMENT = [['Cheng ZHANG', 'AP', 'Invoice received and matched. Moving to clearing today.', 'just now']]
+const SHOTS = [
+  { state: { screen: 'list', step: 2, filter: true }, crop: [0, 0, 1440, 900] },
+  { state: { screen: 'detail', step: 2, modal: 'remind', focus: 'msg', msg: 'Dear Wei, the vendor invoice for TicketCode 99 is due on Dec 30. Please upload the invoice number ASAP.' }, crop: [0, 0, 1440, 900] },
+  { state: { screen: 'detail', step: 3, invoice: 'INV-2025-004187', logs: [LOG_INVOICE, LOG_REMIND], toast: 'Invoice number uploaded' }, crop: [0, 0, 1440, 900] },
+  { state: { screen: 'detail', step: 3, invoice: 'INV-2025-004187', tab: 'comment', comments: LOG_COMMENT }, crop: [0, 0, 1440, 900] },
+  { state: { screen: 'postingForm', paste: 'DP for Qinghai lab lease, vendor VD97537439, CNY 33,056.85, company 1160, cost center 116600, UD Wei KANG', filled: 12 }, crop: [0, 0, 1440, 900] },
+  { state: { screen: 'reminder', rules: { r1: true, r2: true, r3: true } }, crop: [0, 0, 1440, 900] },
+]
 
+export function FlowShot({ i }) {
+  const { state, crop: [x, y, w, h] } = SHOTS[i], who = FLOWS[i].who
+  const ref = useRef(null)
+  const [k, setK] = useState(0)
   useEffect(() => {
-    const ro = new ResizeObserver(([e]) => setScale(e.contentRect.width / CW)); ro.observe(outer.current)
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.3 }); io.observe(outer.current)
-    return () => { ro.disconnect(); io.disconnect() }
-  }, [])
-
-  useEffect(() => {
-    if (!inView) return
-    let alive = true
-    const sleep = ms => new Promise(r => setTimeout(r, ms))
-    const where = hot => {
-      const el = canvas.current?.querySelector(`[data-hot="${hot}"]`)
-      if (!el) return null
-      const a = el.getBoundingClientRect(), b = canvas.current.getBoundingClientRect(), k = b.width / CW
-      return [(a.left - b.left + a.width / 2) / k, (a.top - b.top + a.height / 2) / k]
-    }
-    ;(async () => {
-      const f = FLOWS[flow]
-      setS({ ...f.start }); setProg(0)
-      await sleep(900)
-      for (let i = 0; i < f.steps.length && alive; i++) {
-        const a = f.steps[i]
-        if (a.click) {
-          const p = where(a.click); if (p) { setCur(p); await sleep(850) }
-          if (!alive) return
-          setPress(n => n + 1); setS(x => ({ ...x, ...(a.set || {}), press: a.click })); await sleep(260)
-          setS(x => ({ ...x, press: null, ...(a.then || {}) })); await sleep(250)
-        } else if (a.type) {
-          for (let c = 1; c <= a.text.length && alive; c++) { setS(x => ({ ...x, [a.type]: a.text.slice(0, c) })); await sleep(a.speed ?? 28) }
-        } else if (a.fill) {
-          for (let c = 1; c <= a.fill && alive; c++) { setS(x => ({ ...x, filled: c })); await sleep(120) }
-        } else if (a.set) { setS(x => ({ ...x, ...a.set })); await sleep(250) }
-        else if (a.wait) await sleep(a.wait)
-        setProg((i + 1) / f.steps.length)
-      }
-      await sleep(800)
-      if (alive) setFlow(n => (n + 1) % FLOWS.length)
-    })()
-    return () => { alive = false }
-  }, [inView, flow])
-
-  const Screen = SCREENS[s.screen]
+    const ro = new ResizeObserver(([e]) => setK(e.contentRect.width / w)); ro.observe(ref.current)
+    return () => ro.disconnect()
+  }, [w])
+  const Screen = SCREENS[state.screen]
   return (
-    <div style={{ fontFamily: FONT }}>
-      <style>{KEYFRAMES + '@keyframes bkRip{0%{opacity:.8;transform:scale(.3)}100%{opacity:0;transform:scale(1.8)}}'}</style>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-        {FLOWS.map((f, i) => (
-          <button key={f.name} onClick={() => setFlow(i)} style={{ position: 'relative', overflow: 'hidden', border: 'none', cursor: 'pointer', borderRadius: 999, padding: '9px 16px', fontFamily: 'inherit', fontSize: 13.5, background: i === flow ? '#111' : '#fff', color: i === flow ? '#fff' : '#333', boxShadow: i === flow ? 'none' : 'inset 0 0 0 1px rgba(0,0,0,0.1)', transition: 'all .25s' }}>
-            {i === flow && <span style={{ position: 'absolute', left: 0, bottom: 0, height: 2, width: `${prog * 100}%`, background: '#4fb3ff', transition: 'width .3s' }} />}
-            <span style={{ opacity: 0.55, marginRight: 6 }}>0{i + 1}</span>{f.name}
-          </button>))}
+    <div style={{ borderRadius: 12, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 2px rgba(30,20,70,0.06), 0 24px 56px -28px rgba(30,20,70,0.3)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 12px', background: '#f6f7f9', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+        {['#ff5f57', '#febc2e', '#28c840'].map(c => <span key={c} style={{ width: 9, height: 9, borderRadius: '50%', background: c }} />)}
+        <span style={{ marginLeft: 10, fontSize: 11.5, color: '#8a8f98', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>dp-deposit.bosch.com</span>
+        <span style={{ marginLeft: 'auto', paddingLeft: 10, fontSize: 11.5, color: '#8a8f98', whiteSpace: 'nowrap' }}>{who}</span>
       </div>
-      <div style={{ borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 30px 80px rgba(20,30,60,0.14)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: '#f6f7f9', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-          {['#ff5f57', '#febc2e', '#28c840'].map(c => <span key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c }} />)}
-          <span style={{ marginLeft: 12, fontSize: 12, color: '#8a8f98' }}>{s.screen === 'inbox' ? 'Outlook · Wei KANG (UD)' : 'dp-deposit.bosch.com'}</span>
-          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#8a8f98' }}>{FLOWS[flow].who}</span>
-        </div>
-        <div ref={outer} style={{ position: 'relative', width: '100%', aspectRatio: `${CW} / ${CH}`, overflow: 'hidden' }}>
-          <div ref={canvas} style={{ position: 'absolute', left: 0, top: 0, width: CW, height: CH, transform: `scale(${scale})`, transformOrigin: '0 0' }}>
-            <div key={s.screen} style={{ position: 'absolute', inset: 0, animation: 'bkFade .35s ease both' }}><Screen s={s} /></div>
-            <div style={{ position: 'absolute', left: 0, top: 0, zIndex: 50, pointerEvents: 'none', transform: `translate(${cur[0]}px, ${cur[1]}px)`, transition: 'transform .8s cubic-bezier(.6,0,.25,1)' }}>
-              <span key={press} style={{ position: 'absolute', left: -20, top: -20, width: 40, height: 40, borderRadius: '50%', background: 'rgba(0,123,192,0.4)', opacity: 0, animation: press ? 'bkRip .5s ease-out' : 'none' }} />
-              <svg width="26" height="26" viewBox="0 0 24 24" style={{ position: 'absolute', left: -4, top: -3, filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.3))' }}><path d="M4 2l15 10.5-6.6 1.3 3.8 7.3-2.8 1.4-3.8-7.3L4 20z" fill="#111" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" /></svg>
-            </div>
-          </div>
+      <div ref={ref} aria-hidden style={{ position: 'relative', width: '100%', aspectRatio: `${w} / ${h}`, overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', left: 0, top: 0, width: CW, height: CH, transformOrigin: '0 0', transform: `scale(${k}) translate(${-x}px, ${-y}px)`, visibility: k ? 'visible' : 'hidden', pointerEvents: 'none' }}>
+          <style>{KEYFRAMES}</style>
+          <Screen s={state} />
         </div>
       </div>
-      <p style={{ fontSize: 15, color: '#6b6b6b', margin: '16px 2px 0' }}>{FLOWS[flow].caption}</p>
     </div>
   )
 }
