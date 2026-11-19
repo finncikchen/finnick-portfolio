@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Scaled } from './Dashboard'
 import { C, FONT, Btn, Tag, Field, Toggle, KEYFRAMES } from './kit'
 
@@ -7,9 +7,9 @@ const T = ({ children, c = C.text, s = 13, w = 400, style }) => <span style={{ f
 
 function Tile({ name, area, children, gap = 14 }) {
   return (
-    <div style={{ gridArea: area, background: '#fff', borderRadius: 20, padding: 26, display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
-      <span style={{ fontFamily: FONT, fontSize: 11, color: C.faint, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{name}</span>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap, minHeight: 0 }}>{children}</div>
+    <div className="ds-tile" style={{ gridArea: area, background: '#fff', borderRadius: 20, padding: 26, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+      <span style={{ flex: 'none', fontFamily: FONT, fontSize: 11, color: C.faint, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{name}</span>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap, marginTop: 18 }}>{children}</div>
     </div>
   )
 }
@@ -17,7 +17,7 @@ const Row = ({ children, gap = 10, wrap = true, style }) => <div style={{ displa
 
 const Check = ({ on, label, part }) => (
   <Row gap={8} wrap={false}>
-    <span style={{ width: 16, height: 16, borderRadius: 3, border: `1px solid ${on || part ? C.blue : '#c7cbd1'}`, background: on ? C.blue : '#fff', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 10, transition: 'all .2s' }}>{on ? '✓' : part ? <span style={{ width: 8, height: 2, background: C.blue }} /> : ''}</span>
+    <span style={{ flex: 'none', boxSizing: 'border-box', width: 16, height: 16, borderRadius: 3, border: `1px solid ${on || part ? C.blue : '#c7cbd1'}`, background: on ? C.blue : '#fff', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 10, transition: 'all .2s' }}>{on ? '✓' : part ? <span style={{ width: 8, height: 2, background: C.blue }} /> : ''}</span>
     <T>{label}</T>
   </Row>
 )
@@ -70,14 +70,24 @@ function Tabs() {
   )
 }
 
-const CW = 1200, ROW = 260, GAP = 16, CH = ROW * 4 + GAP * 3
+const CW = 1200, ROW = 260, GAP = 16
 const AREAS = '"color color type button" "status field prog prog" "kpi tabs tips download" "table table table toast"'
 
 export default function DesignSystem() {
+  // rows are at least ROW tall and grow to fit; the scaled canvas takes the measured height
+  const grid = useRef(null)
+  const [h, setH] = useState(ROW * 4 + GAP * 3)
+  useLayoutEffect(() => {
+    const el = grid.current
+    const fit = () => setH(el.offsetHeight)
+    fit()
+    const ro = new ResizeObserver(fit); ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
   return (
-    <Scaled w={CW} h={CH}>
-      <style>{KEYFRAMES}</style>
-      <div style={{ width: CW, height: CH, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: `repeat(4, ${ROW}px)`, gap: GAP, gridTemplateAreas: AREAS, fontFamily: FONT }}>
+    <Scaled w={CW} h={h}>
+      <style>{KEYFRAMES + '.ds-tile>div>*{flex-shrink:0}'}</style>
+      <div ref={grid} style={{ width: CW, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gridTemplateRows: `repeat(4, minmax(${ROW}px, auto))`, gap: GAP, gridTemplateAreas: AREAS, fontFamily: FONT }}>
         <Tile name="Colour" area="color">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '14px 10px' }}>
             {[['Bosch Red', C.red], ['Blue', C.blue], ['Blue dark', C.blueDark], ['Purple', C.purple], ['Teal', C.teal], ['Green', C.green], ['Ink', C.ink], ['Grey 70', C.sub], ['Grey 40', C.faint], ['Line', C.line], ['Canvas', C.bg], ['Blue 5', C.blueSoft]].map(([n, c]) => (
@@ -87,10 +97,10 @@ export default function DesignSystem() {
         </Tile>
 
         <Tile name="Typography" area="type" gap={10}>
-          <T s={44} w={700} c={C.ink} style={{ lineHeight: 1, letterSpacing: '-0.02em' }}>Aa</T>
+          <T s={44} w={700} c={C.ink} style={{ display: 'block', lineHeight: 1.05, letterSpacing: '-0.02em' }}>Aa</T>
           <T s={12} c={C.sub}>Helvetica Neue · Bosch Sans in product</T>
           <div style={{ height: 1, background: C.line, margin: '4px 0' }} />
-          {[[20, 700, 'Title 20'], [14, 700, 'Heading 14'], [13, 400, 'Body 13 / 20'], [11.5, 400, 'Caption 11.5']].map(([sz, w, t]) => <T key={t} s={sz} w={w} c={C.ink}>{t}</T>)}
+          {[[20, 700, 'Title 20'], [14, 700, 'Heading 14'], [13, 400, 'Body 13 / 20'], [11.5, 400, 'Caption 11.5']].map(([sz, w, t]) => <T key={t} s={sz} w={w} c={C.ink} style={{ display: 'block', lineHeight: 1.35 }}>{t}</T>)}
         </Tile>
 
         <Tile name="Button" area="button" gap={12}>
