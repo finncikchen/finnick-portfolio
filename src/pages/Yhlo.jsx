@@ -6,6 +6,7 @@ import imgDevice      from '../assets/images/yhlo/device-front.webp'
 import { Workbench } from '../components/yhlo/ITLA'
 import { TrackHome, TrackEvents, TrackUnits, TrackTasks, DeviceZoom } from '../components/yhlo/Track'
 import { Scaled } from '../components/bosch/Dashboard'
+import Library from '../components/yhlo/Library'
 import imgSystem      from '../assets/images/yhlo/system.png'
 import imgExpo        from '../assets/images/yhlo/expo.png'
 import imgMuse        from '../assets/images/yhlo/muse-award.png'
@@ -14,7 +15,6 @@ import imgLab2        from '../assets/images/yhlo/lab2.jpg'
 import imgLab3        from '../assets/images/yhlo/lab3.jpg'
 import imgAtomic      from '../assets/images/yhlo/atomic.png'
 import imgGloves      from '../assets/images/yhlo/gloves.png'
-import imgLibrary     from '../assets/images/yhlo/component-library.jpg'
 
 const CY = '#0BC5D1'
 const RULE = { borderTop: '1px solid rgba(0,0,0,0.12)', paddingTop: 20 }
@@ -205,7 +205,8 @@ export default function Yhlo() {
             ))}
           </div>
           <Block>
-            <img src={imgLibrary} alt="YHLO component library" style={{ ...img, borderRadius: 28 }} />
+            <p style={tag}>Design library</p>
+            <Library />
           </Block>
         </W>
       </section>
