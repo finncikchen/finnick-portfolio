@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
 import unitThumb from '../../assets/images/yhlo/unit-thumb.webp'
+import artRocket from '../../assets/images/yhlo/units/rocket.svg'
+import artInit from '../../assets/images/yhlo/units/init.webp'
+import artLock from '../../assets/images/yhlo/units/lock.webp'
+import artBypass from '../../assets/images/yhlo/units/bypass.webp'
+import artDisable from '../../assets/images/yhlo/units/disable.webp'
+const UNIT_ART = { rocket: artRocket, init: artInit, lock: artLock, bypass: artBypass, disable: artDisable }
 
 // Track unit screens, rebuilt live in English from Figma "Frame 184" (4:2090, 1280 x 800)
 // and the English case deck (4010:20142). Wrap with <Scaled w={1280} h={800}>.
@@ -211,27 +217,30 @@ export function TrackTasks() {
 /* ── Unit control ── */
 export function TrackUnits() {
   const t = useTick(1400, 5)
+  // Card art from Figma (Portfolio-mockups 55:2873): rocket is the original vector; the other four come from the 4K design export.
   const cards = [
-    ['Run / Pause', 'Tip: tap "Resume" to restore the running state', 'M12 3l5 9h-3v8h-4v-8H7z', [['Pause', I.pause], ['Resume', I.play]]],
-    ['Initialize unit', 'The unit resets to its default state after initializing', I.units, [['Initialize', I.clock]]],
-    ['Lock / Unlock cover', 'After unlocking, the cover can be opened', I.lock, [['Lock', I.lock], ['Unlock', I.unlock]]],
-    ['Bypass unit', 'Bypass this unit so the line keeps running', 'M6 4v6a4 4 0 004 4h8M15 10l3 4-3 4', [['Connect', I.units], ['Bypass', 'M4 12h16']]],
-    ['Disable unit', 'A disabled unit leaves the line', 'M5 5l14 14M12 21a9 9 0 100-18 9 9 0 000 18z', [['Enable', I.play], ['Disable', 'M5 5l14 14']]],
+    ['Run / Pause', 'Tip: tap "Resume" to restore the running state', 'rocket', [['Pause', I.pause], ['Resume', I.play]]],
+    ['Initialize unit', 'The unit resets to its default state after initializing', ['init', 154.8], [['Initialize', I.refresh]]],
+    ['Lock / Unlock cover', 'After unlocking, the cover can be opened', ['lock', 106.7], [['Lock', I.lock], ['Unlock', I.unlock]]],
+    ['Bypass unit', 'Bypass this unit so the line keeps running', ['bypass', 106.7], [['Connect', I.units], ['Bypass', 'M4 12h16']]],
+    ['Disable unit', 'A disabled unit leaves the line', ['disable', 104.9], [['Enable', I.play], ['Disable', 'M5 5l14 14M12 21a9 9 0 100-18 9 9 0 000 18z']]],
   ]
   return (
     <TrackFrame nav="units">
       <Panel icon={I.units} title="Unit control">
-        {cards.map(([ti, d, icon, btns], i) => {
+        {cards.map(([ti, d, art, btns], i) => {
           const x = 100 + (i % 3) * 385, y = 196 + Math.floor(i / 3) * 226, on = t === i
           return (
-            <div key={ti} style={abs(x, y, 320, 180, { borderRadius: 10, background: '#fff', boxShadow: on ? `0 0 0 1.5px ${CY2}, 0 16px 34px rgba(11,197,209,0.18)` : '0 0 0 1px #eceff1, 0 8px 22px rgba(0,0,0,0.06)', overflow: 'hidden', transition: 'box-shadow .4s' })}>
-              <div style={abs(18, 70, 120, 120, { opacity: 0.09 })}><Ico d={icon} c={INK} s={112} sw={1.3} /></div>
-              <span style={abs(28, 30, 280, 30)}><T s={22} w={700} c={INK}>{ti}</T></span>
-              <span style={abs(28, 64, 280, 18)}><T s={11.5} c={SUB}>{d}</T></span>
-              <div style={abs(0, 126, 300, 30, { display: 'flex', justifyContent: 'flex-end', gap: 10 })}>
+            <div key={ti} style={abs(x, y, 320, 180, { borderRadius: 13, background: '#fff', boxShadow: on ? `inset 0 0 0 1.5px ${CY2}, 0 4px 18px rgba(11,197,209,0.22)` : `inset 0 0 0 1.4px ${LINE}, 0 3px 16px rgba(0,0,0,0.13)`, overflow: 'hidden', transition: 'box-shadow .4s' })}>
+              {art === 'rocket'
+                ? <div style={abs(1.4, 75.4, 146.5, 105.3, { overflow: 'hidden' })}><div style={{ position: 'absolute', left: 2.1, top: -12.8, transform: 'scale(0.89)', transformOrigin: '0 0' }}><img src={UNIT_ART.rocket} alt="" style={{ display: 'block' }} /></div></div>
+                : <img src={UNIT_ART[art[0]]} alt="" style={abs(2.1, 73.8, art[1], 93.8, { display: 'block' })} />}
+              <span style={abs(28, 26, 280, 26)}><T s={20} w={700} c={BODY}>{ti}</T></span>
+              <span style={abs(28, 58, 280, 16)}><T s={11} c={SUB}>{d}</T></span>
+              <div style={abs(0, 125, 290, 27, { display: 'flex', justifyContent: 'flex-end', gap: 14 })}>
                 {btns.map(([l, ic], k) => {
-                  const primary = k === 0, press = on && btns.length > 1 && k === 1
-                  return <span key={l} style={{ display: 'flex', alignItems: 'center', gap: 6, height: 30, padding: '0 16px', borderRadius: 15, boxShadow: `inset 0 0 0 1px ${press ? CY : primary ? BODY : '#e1e4e6'}`, background: press ? CY : '#fff', transition: 'all .3s' }}><Ico d={ic} s={14} c={press ? '#fff' : primary ? BODY : '#c3c7ca'} /><T s={13} c={press ? '#fff' : primary ? INK : '#c3c7ca'}>{l}</T></span>
+                  const press = on && btns.length > 1 && k === 1, idle = k === 1 && !press
+                  return <span key={l} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minWidth: 81, boxSizing: 'border-box', height: 27, padding: '0 12px', borderRadius: 36, background: press ? CY : '#fff', boxShadow: `inset 0 0 0 1.1px ${press ? CY : SUB}`, opacity: idle ? 0.3 : 1, transition: 'all .3s' }}><Ico d={ic} s={13} c={press ? '#fff' : BODY} /><T s={11.5} c={press ? '#fff' : BODY}>{l}</T></span>
                 })}
               </div>
             </div>
