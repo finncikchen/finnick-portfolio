@@ -16,8 +16,6 @@ import thumbBytedance  from '../assets/images/thumb-bytedance.webp'
 import thumbBosch      from '../assets/images/thumb-bosch.png'
 import thumbYhlo       from '../assets/images/thumb-yhlo.png'
 import thumbFlowerStar from '../assets/images/thumb-flower-star.png'
-import thumbWenhong    from '../assets/images/thumb-wenhong.webp'
-import drupaLogo       from '../assets/images/wenhong/drupa-logo.png'
 import Cover from '../components/HomeCovers'
 import thumbColorDiary from '../assets/images/thumb-colordiary.webp'
 // Cisco thumbnail not yet available — card uses gradient placeholder
@@ -67,19 +65,11 @@ const PROJECTS = [
     category: 'products', thumb: thumbColorDiary, cover: true, objectPos: 'center center',
     url: 'https://colordiary.finnickchen.site/',
   },
-  {
-    id: 'wenhong', title: 'Wenhong · Machinery Design',
-    subtitle: 'Industrial design for packaging machinery, driven by brand gene extraction.',
-    tags: ['Industrial Design', 'Brand Language'], year: '2022',
-    category: 'hardware', thumb: thumbWenhong, cover: false, objectPos: 'center 55%',
-    mark: drupaLogo,
-  },
 ]
 
 const FILTERS = [
   { key: 'all',      label: 'All' },
   { key: 'products', label: 'Products' },
-  { key: 'hardware', label: 'Hardware' },
 ]
 
 export default function Home() {
