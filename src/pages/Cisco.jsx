@@ -881,14 +881,13 @@ export default function Cisco() {
         </div>
 
         <div style={{ ...WIDE, marginTop: BLOCK }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gridAutoRows: 'clamp(200px, 30vw, 380px)', gap: 12 }}>
+          {/* columns follow each photo's own ratio (2000x1098, 2000x1501) so both show uncropped at one height */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.821fr 1.332fr', gap: 12 }}>
             {[
-              ['/cisco-ui/team-photo.webp', 'Cisco intern cohort and team', 'span 3', 'center'],
-              ['/cisco-ui/cisco-sign.webp', 'At the Cisco sign', 'span 2', '80% center'],
-              ['/cisco-ui/img-9317.jpg', 'Cisco intern event', 'span 2', 'center 70%'],
-              ['/cisco-ui/team-dinner.jpg', 'Team dinner', 'span 3', 'center'],
-            ].map(([src, alt, span, pos]) => (
-              <img key={src} src={src} alt={alt} style={{ gridColumn: span, width: '100%', height: '100%', objectFit: 'cover', objectPosition: pos, borderRadius: 20, display: 'block' }} />
+              ['/cisco-ui/team-photo.webp', 'Cisco intern cohort and team', '2000 / 1098'],
+              ['/cisco-ui/cisco-sign.webp', 'At the Cisco sign', '2000 / 1501'],
+            ].map(([src, alt, ratio]) => (
+              <img key={src} src={src} alt={alt} style={{ width: '100%', aspectRatio: ratio, objectFit: 'cover', borderRadius: 20, display: 'block' }} />
             ))}
           </div>
         </div>
